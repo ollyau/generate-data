@@ -1,5 +1,6 @@
 import re
 import numpy as np
+from fitsigma import get_sigfits
 from utils import header, getstream
 
 def _readTempsMoments(fname):
@@ -28,12 +29,14 @@ def _read_s2_params(fname):
         stream.close()
     return float(fullbin_radius.group(1))
 
-def writemeta(fbininfo, ftemps1, ftemps2, fs2params, output):
+def writemeta(fbininfo, ftemps1, ftemps2, fs2params, fbinmoments, output):
     items = {}
 
     bininfo = header(fbininfo)
     moments = _readTempsMoments(ftemps1), _readTempsMoments(ftemps2)
     fullbin_radius = _read_s2_params(fs2params)
+    binmoments = np.genfromtxt(fbinmoments,names=True,skip_header=1)
+    bindata = np.genfromtxt(fbininfo,names=True,skip_header=1)
 
     rmax = np.genfromtxt(fbininfo, usecols=8)
 
@@ -44,6 +47,8 @@ def writemeta(fbininfo, ftemps1, ftemps2, fs2params, output):
     for i, gal in enumerate(['gal1', 'gal2']):
         for j, moment in enumerate(['V', 'sigma', 'h3', 'h4', 'h5', 'h6']):
             items['{0}_{1}'.format(gal, moment)] = moments[i][j]
+
+    items.update(get_sigfits(binmoments,bindata,bininfo.metadata['gal d']))
 
     width = max(len(str(k)) for k in items.keys()) + 1
     if width < 22:

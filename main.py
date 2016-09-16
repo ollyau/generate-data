@@ -83,7 +83,7 @@ def processlocal(args):
 
             joindata(s2_folded_bininfo, s3_B_folded_moments, s4_folded_rprofiles, data_output)
             createfits(s2_folded_binspectra, s2_folded_fullgalaxy, s2_folded_bininfo, s3_B_folded_moments, s4_folded_rprofiles, fits_output)
-            writemeta(s2_folded_bininfo, s3_A_folded_temps_1, s3_A_folded_temps_2, s2_params, meta_output)
+            writemeta(s2_folded_bininfo, s3_A_folded_temps_1, s3_A_folded_temps_2, s2_params, s3_B_folded_moments, meta_output)
 
 def _getboxitems(f, relpath):
     dirs = [d for d in re.split(r'[\\/]+', relpath) if d is not '']
