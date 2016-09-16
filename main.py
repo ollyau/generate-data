@@ -3,7 +3,15 @@ import os
 import re
 from io import BytesIO
 
-from boxsdk import Client, OAuth2
+try:
+    from boxsdk import Client, OAuth2
+except Exception as e:
+    print '\n=================='
+    print 'Error in imports: ',e
+    print '------------------'
+    print ('Everything will run fine as long as you are not'
+           ' trying to use the Box API')
+    print '==================\n'
 
 from fits import createfits
 from metadata import writemeta
