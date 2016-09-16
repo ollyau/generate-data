@@ -23,31 +23,31 @@ def main():
     parser.add_argument('-e', '--exclude', help='Comma separated list of galaxies to exclude.')
     parser.add_argument('-s', '--skip-completed', help='Skips galaxies that were previously processed.')
 
-    args = parser.parse_args()
+    args = vars(parser.parse_args())
 
-    files = os.listdir(args.directory)
+    files = os.listdir(args['directory'])
     search = re.compile(r'^((?:NGC|UGC)\d+)(?:(?:_meta\.txt)|\.(?:txt|fits))$').search
     galaxies = sorted(set(m.group(1) for m in (search(f) for f in files) if m))
 
-    if 'skip-completed' in args:
+    if args['skip-completed'] is not None:
         search1 = re.compile(r'^((?:NGC|UGC)\d+)\.pdf$').search
-        completedfiles = os.listdir(args.output)
+        completedfiles = os.listdir(args['output'])
         completed = set(m.group(1) for m in (search1(f) for f in completedfiles) if m)
         galaxies = galaxies.difference(completed)
 
-    if 'include' in args:
+    if args['include'] is not None:
         include = [x.strip() for x in args['include'].split(',') if x and not x.isspace()]
         galaxies = galaxies.intersection(include)
 
-    if 'exclude' in args:
+    if args['exclude'] is not None:
         exclude = [x.strip() for x in args['exclude'].split(',') if x and not x.isspace()]
         galaxies = galaxies.difference(exclude)
 
     for g in galaxies:
-        dest = os.path.join(args.output, '{0}.pdf'.format(g))
-        fitsfile = os.path.join(args.directory, '{0}.fits'.format(g))
-        data = os.path.join(args.directory, '{0}.txt'.format(g))
-        meta = os.path.join(args.directory, '{0}_meta.txt'.format(g))
+        dest = os.path.join(args['output'], '{0}.pdf'.format(g))
+        fitsfile = os.path.join(args['directory'], '{0}.fits'.format(g))
+        data = os.path.join(args['directory'], '{0}.txt'.format(g))
+        meta = os.path.join(args['directory'], '{0}_meta.txt'.format(g))
         print('plotting {0}'.format(dest))
         plot(g, dest, fitsfile, data, meta)
 
