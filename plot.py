@@ -21,7 +21,7 @@ def main():
     parser.add_argument('-o', '--output', help='Path to destination directory.', required=True)
     parser.add_argument('-i', '--include', help='Comma separated list of galaxies to include.')
     parser.add_argument('-e', '--exclude', help='Comma separated list of galaxies to exclude.')
-    parser.add_argument('-s', '--skip-completed', help='Skips galaxies that were previously processed.')
+    parser.add_argument('-s', '--skipcompleted', help='Skips galaxies that were previously processed.')
 
     args = vars(parser.parse_args())
 
@@ -29,7 +29,7 @@ def main():
     search = re.compile(r'^((?:NGC|UGC)\d+)(?:(?:_meta\.txt)|\.(?:txt|fits))$').search
     galaxies = sorted(set(m.group(1) for m in (search(f) for f in files) if m))
 
-    if args['skip-completed'] is not None:
+    if args['skipcompleted'] is not None:
         search1 = re.compile(r'^((?:NGC|UGC)\d+)\.pdf$').search
         completedfiles = os.listdir(args['output'])
         completed = set(m.group(1) for m in (search1(f) for f in completedfiles) if m)
