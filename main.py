@@ -23,19 +23,19 @@ def main():
     parser.add_argument('-d', '--directory', help='Path to Reduced-Data folder.')
     parser.add_argument('-o', '--output', help='Path to destination directory.')
 
-    parser.add_argument('-cid', '--client-id', help='Client ID from Box API.')
-    parser.add_argument('-secret', '--client-secret', help='Client secret from Box API.')
-    parser.add_argument('-token', '--access-token', help='Developer access token for Box API.')
+    parser.add_argument('-cid', '--clientid', help='Client ID from Box API.')
+    parser.add_argument('-secret', '--clientsecret', help='Client secret from Box API.')
+    parser.add_argument('-token', '--accesstoken', help='Developer access token for Box API.')
 
     parser.add_argument('-i', '--include', help='Comma separated list of galaxies to include.')
     parser.add_argument('-e', '--exclude', help='Comma separated list of galaxies to exclude.')
 
-    parser.add_argument('-skip', '--skip-completed', help='Skips galaxies that were previously processed.')
+    parser.add_argument('-skip', '--skipcompleted', help='Skips galaxies that were previously processed.')
 
     args = vars(parser.parse_args())
     if args['directory'] is not None and args['output'] is not None:
         processlocal(args)
-    elif args['client-id'] is not None and args['client-secret'] is not None and args['access-token'] is not None:
+    elif args['clientid'] is not None and args['clientsecret'] is not None and args['accesstoken'] is not None:
         processbox(args)
     else:
         raise ValueError('invalid argument input')
@@ -48,7 +48,7 @@ def processlocal(args):
     search = re.compile(r'^(?:NGC|UGC)\d+$').search
     galaxies = sorted(set(m.group(0) for m in (search(f) for f in files) if m))
 
-    if args['skip-completed'] is not None:
+    if args['skipcompleted'] is not None:
         search1 = re.compile(r'^((?:NGC|UGC)\d+)\.(?:txt|fits)$').search
         completedfiles = os.listdir(outputdir)
         completed = set(m.group(1) for m in (search1(f) for f in completedfiles) if m)
@@ -96,9 +96,9 @@ def _getboxitems(f, relpath):
 
 # get a client id, client secret, and 1 hour developer access token at https://berkeley.app.box.com/developers/services
 def processbox(args):
-    cid = args['client-id']
-    secret = args['client-secret']
-    token = args['access-token']
+    cid = args['clientid']
+    secret = args['clientsecret']
+    token = args['accesstoken']
 
     oauth = OAuth2(client_id=cid, client_secret=secret, access_token=token)
     client = Client(oauth)
@@ -118,7 +118,7 @@ def processbox(args):
 
     galaxies = set(m.group(0) for m in (search(g.name) for g in dataitems) if m)
 
-    if args['skip-completed'] is not None:
+    if args['skipcompleted'] is not None:
         search1 = re.compile(r'^((?:NGC|UGC)\d+)\.(?:txt|fits)$').search
         completed = set(m.group(1) for m in (search1(g.name) for g in previousoutput) if m)
         galaxies = galaxies.difference(completed)
