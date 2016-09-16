@@ -1,0 +1,49 @@
+# Columns are as follows...
+#  binid nfibers flux x y r th rmin rmax thmin thmax
+# Metadata is as follows...
+#               bin type: folded
+#             coord unit: arcsec
+#                 gal ba: 0.86
+#              gal bansa: -99.0
+#          gal batwomass: 0.86
+#                gal bgg: False
+#                  gal d: 100.2
+#                gal dec: 11.1217
+#                gal env: 1
+#                gal hdc: 0
+#                gal ldc: 7
+#              gal mhalo: 10.0
+#                 gal mk: -25.75
+#                 gal pa: 5
+#              gal pansa: -99.0
+#          gal patwomass: 5
+#                 gal ra: 264.3892
+#                 gal re: 25.1549297695
+#              gal rensa: -99.0
+#          gal retwomass: 12.8
+#             gal twompp: 0
+#               ifu file: RovallfibUGC10918_log.fits
+#          ifu file date: Thu Dec 24 15:09:52 2015
+#                ir file: UGC10918-s1-mainrun-ir.txt
+#           ir file date: Tue Jan  5 09:08:49 2016
+#        positive x axis: west
+#        positive y axis: north
+#         r best fullbin: 25.0
+#            theta units: degrees
+#           threshold ar: 1.5
+#          threshold s2n: 20.0
+# Additional comments...
+#  Theta=0 is defined at: +y (north)
+#  Theta increases counterclockwise (towards east)
+#  Galaxy PA is listed using the same definition of theta
+#  Note that x,y are bin centers in cartesian coordinates,
+#   while r,th are bin centers in polar coordinates,
+#   and they do not represent the same points!
+   1	   1	62082.50781	  2.72794	 -1.61945	  3.17243	-120.69559	      nan	      nan	      nan	      nan
+   2	   1	49263.83594	 -0.72166	 -3.62102	  3.69223	168.72884	      nan	      nan	      nan	      nan
+   3	   1	52420.34375	  3.15914	  2.67895	  4.14210	-49.70210	      nan	      nan	      nan	      nan
+   4	   1	45888.25391	 -0.72166	  4.52946	  4.58659	  9.05257	      nan	      nan	      nan	      nan
+   5	  11	13286.57129	  5.28850	  6.18050	  8.96607	-40.70593	  4.60159	 14.73208	-85.00000	  5.00001
+   6	  14	12296.00195	  6.38353	 -5.43991	  9.34602	-127.16598	  4.60159	 14.73208	-174.99998	-85.00000
+   7	 167	1574.07471	 16.53094	 20.36559	 29.36837	-38.21420	 14.73208	 70.75994	-85.00000	  5.00001
+   8	 176	1568.93140	 20.00692	-18.25896	 29.86595	-131.94063	 14.73208	 70.75994	-174.99998	-85.00000

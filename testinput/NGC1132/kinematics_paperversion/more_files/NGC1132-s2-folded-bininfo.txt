@@ -1,0 +1,51 @@
+# Columns are as follows...
+#  binid nfibers flux x y r th rmin rmax thmin thmax
+# Metadata is as follows...
+#               bin type: folded
+#             coord unit: arcsec
+#                 gal ba: 0.63
+#              gal bansa: 0.63
+#          gal batwomass: 0.66
+#                gal bgg: True
+#                  gal d: 97.6
+#                gal dec: -1.2747
+#                gal env: 3
+#                gal hdc: 3
+#                gal ldc: 7
+#              gal mhalo: 13.6
+#                 gal mk: -25.7
+#                 gal pa: 141.3
+#              gal pansa: 141.3
+#          gal patwomass: -50
+#                 gal ra: 43.2159
+#                 gal re: 30.9
+#              gal rensa: 30.9
+#          gal retwomass: 16.1
+#             gal twompp: 8
+#               ifu file: RovallfibNGC1132_log.fits
+#          ifu file date: Mon Dec 28 16:15:04 2015
+#                ir file: NGC1132-s1-mainrun-ir.txt
+#           ir file date: Fri Jan  8 20:11:54 2016
+#        positive x axis: west
+#        positive y axis: north
+#         r best fullbin: 25.0
+#            theta units: degrees
+#           threshold ar: 1.5
+#          threshold s2n: 20.0
+# Additional comments...
+#  Theta=0 is defined at: +y (north)
+#  Theta increases counterclockwise (towards east)
+#  Galaxy PA is listed using the same definition of theta
+#  Note that x,y are bin centers in cartesian coordinates,
+#   while r,th are bin centers in polar coordinates,
+#   and they do not represent the same points!
+   1	   1	94941.57812	  0.24562	  1.51990	  1.53962	 -9.17964	      nan	      nan	      nan	      nan
+   2	   1	86977.07031	 -0.66053	 -2.73001	  2.80878	166.39854	      nan	      nan	      nan	      nan
+   3	   2	33913.64844	 -3.61852	 -2.53711	  4.59022	121.04787	  3.14358	  6.82412	-263.69998	-218.69997
+   4	   2	26277.91406	 -4.71618	  3.03078	  5.62540	 57.04851	  3.14358	  6.82412	 51.30000	-263.69998
+   5	   2	25054.63281	 -2.63964	  4.10612	  4.88788	 31.85483	  3.14358	  6.82412	  6.30000	 51.30000
+   6	   2	34039.41016	  1.78344	  3.99918	  4.52676	-25.10658	  3.14358	  6.82412	-38.69999	  6.30000
+   7	  49	7352.38379	-12.02790	 -2.44726	 13.59409	100.56851	  6.82412	 21.87157	 51.30000	-218.69997
+   8	  44	7392.13281	  0.13841	 12.48279	 13.64677	 -1.15158	  6.82412	 21.87157	-38.69999	 51.30000
+   9	 361	1353.43347	-34.65313	 -9.98611	 40.14500	104.97636	 21.87157	 76.88612	 51.30000	-218.69997
+  10	 269	1553.59814	  0.86698	 32.42657	 36.42926	 -0.59307	 21.87157	 76.88612	-38.69999	 51.30000
