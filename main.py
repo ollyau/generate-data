@@ -25,9 +25,9 @@ def main():
     parser.add_argument('-skip', '--skip-completed', help='Skips galaxies that were previously processed.')
 
     args = vars(parser.parse_args())
-    if 'directory' in args and 'output' in args:
+    if args['directory'] is not None and args['output'] is not None:
         processlocal(args)
-    elif 'client-id' in args and 'client-secret' in args and 'access-token' in args:
+    elif args['client-id'] is not None and args['client-secret'] is not None and args['access-token'] is not None:
         processbox(args)
     else:
         raise ValueError('invalid argument input')
@@ -40,17 +40,17 @@ def processlocal(args):
     search = re.compile(r'^(?:NGC|UGC)\d+$').search
     galaxies = sorted(set(m.group(0) for m in (search(f) for f in files) if m))
 
-    if 'skip-completed' in args:
+    if args['skip-completed'] is not None:
         search1 = re.compile(r'^((?:NGC|UGC)\d+)\.(?:txt|fits)$').search
         completedfiles = os.listdir(outputdir)
         completed = set(m.group(1) for m in (search1(f) for f in completedfiles) if m)
         galaxies = galaxies.difference(completed)
 
-    if 'include' in args:
+    if args['include'] is not None:
         include = [x.strip() for x in args['include'].split(',') if x and not x.isspace()]
         galaxies = galaxies.intersection(include)
 
-    if 'exclude' in args:
+    if args['exclude'] is not None:
         exclude = [x.strip() for x in args['exclude'].split(',') if x and not x.isspace()]
         galaxies = galaxies.difference(exclude)
 
@@ -110,16 +110,16 @@ def processbox(args):
 
     galaxies = set(m.group(0) for m in (search(g.name) for g in dataitems) if m)
 
-    if 'skip-completed' in args:
+    if args['skip-completed'] is not None:
         search1 = re.compile(r'^((?:NGC|UGC)\d+)\.(?:txt|fits)$').search
         completed = set(m.group(1) for m in (search1(g.name) for g in previousoutput) if m)
         galaxies = galaxies.difference(completed)
 
-    if 'include' in args:
+    if args['include'] is not None:
         include = [x.strip() for x in args['include'].split(',') if x and not x.isspace()]
         galaxies = galaxies.intersection(include)
 
-    if 'exclude' in args:
+    if args['exclude'] is not None:
         exclude = [x.strip() for x in args['exclude'].split(',') if x and not x.isspace()]
         galaxies = galaxies.difference(exclude)
 
