@@ -48,3 +48,9 @@ def get_sigfits(moments, bininfo, d):
     items['sigPL_gamma'] = pPL[1]
     items['sigPL_chisq'] = chisqPL    
     return items
+
+def get_h4fits(moments, bininfo, d):
+    rphys = arcsec_to_kpc(bininfo['r'],float(d)*1e3)
+    p = np.polyfit(np.log10(rphys),moments['h4'],1,w=1/moments['h4err'])
+    items = {'h4grad':p[0], 'h4intercept':p[1]}
+    return items
