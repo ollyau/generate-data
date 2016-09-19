@@ -1,6 +1,7 @@
 import re
 import numpy as np
 from fitsigma import get_sigfits
+from annuli import get_re_averages
 from utils import header, getstream
 
 def _readTempsMoments(fname):
@@ -49,6 +50,8 @@ def writemeta(fbininfo, ftemps1, ftemps2, fs2params, fbinmoments, output):
             items['{0}_{1}'.format(gal, moment)] = moments[i][j]
 
     items.update(get_sigfits(binmoments,bindata,bininfo.metadata['gal d']))
+
+    items.update(get_re_averages(binmoments,bindata,bininfo.metadata['gal re']))
 
     width = max(len(str(k)) for k in items.keys()) + 1
     if width < 22:
