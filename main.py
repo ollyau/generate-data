@@ -13,9 +13,9 @@ except Exception as e:
            ' trying to use the Box API')
     print '==================\n'
 
-from fits import createfits
-from metadata import writemeta
-from text import joindata
+from modules.fits import createfits
+from modules.metadata import writemeta
+from modules.text import joindata
 
 def main():
     parser = argparse.ArgumentParser(description='Creates public data from MASSIVE survey reduced data.')
