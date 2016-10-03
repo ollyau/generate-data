@@ -17,22 +17,22 @@ def joindata(bininfopath, momentspath, rprofilespath, outputPath):
     columns = [
         ('bin', '%5d'),
         ('nf', '%4d'),
-        ('an', '%3d'),
+        ('ann', '%3d'),
         ('flux', '%10.1f'),
         ('r', '%6.2f'),
         ('th', '%7.2f'),
         ('V', '%8.2f'),
-        ('Verr', '%7.2f'),
+        ('Ve', '%7.2f'),
         ('sig', '%6.2f'),
-        ('sigerr', '%6.2f'),
+        ('sige', '%6.2f'),
         ('h3', '%7.4f'),
-        ('h3err', '%6.4f'),
+        ('h3e', '%6.4f'),
         ('h4', '%7.4f'),
-        ('h4err', '%6.4f'),
+        ('h4e', '%6.4f'),
         ('h5', '%7.4f'),
-        ('h5err', '%6.4f'),
+        ('h5e', '%6.4f'),
         ('h6', '%7.4f'),
-        ('h6err', '%6.4f')
+        ('h6e', '%6.4f')
         ]
 
     cols, fmts = zip(*columns)
@@ -52,7 +52,7 @@ def joindata(bininfopath, momentspath, rprofilespath, outputPath):
             })
 
     rprofiles = np.genfromtxt(rprofilespath,dtype=None,names=True,skip_header=1)
-        
+
     annuli = np.searchsorted(rprofiles['r_en'],bininfo['r'])
     r_check = np.zeros(len(rprofiles))
     for i in range(max(annuli)+1):
@@ -60,8 +60,8 @@ def joindata(bininfopath, momentspath, rprofilespath, outputPath):
         lum = bininfo['nfibers'][ii]*bininfo['flux'][ii]
         r_check[i] = np.average(bininfo['r'][ii],weights=lum)
     if not all(np.isclose(r_check,rprofiles['r'])):
-        raise Exception('WARNING, YOUR ANNULI ARE WRONG')
-    
+        raise RuntimeError('WARNING, YOUR ANNULI ARE WRONG')
+
     newdata = np.column_stack((
         bininfo['binid'],
         bininfo['nfibers'],
@@ -99,8 +99,8 @@ def joindata(bininfopath, momentspath, rprofilespath, outputPath):
     np.savetxt(outputPath, newdata, header=newheader.format(*cols), fmt=fmts)
 
 def test():
-    dataDirectory = r'..\kinematics_paperversion\kinematics_paperversion\more_files'
-    outputDirectory = r'..\Output\batch2'
+    dataDirectory = r'..\testinput\NGC1132\kinematics_paperversion\more_files'
+    outputDirectory = r'..\..\Output\thing'
     files = os.listdir(dataDirectory)
 
     search = re.compile(r'^((?:NGC|UGC)\d+).+\.txt$').search
@@ -110,7 +110,7 @@ def test():
         thing1 = os.path.join(dataDirectory, gal + '-s2-folded-bininfo.txt')
         thing2 = os.path.join(dataDirectory, gal + '-s3-B-folded-moments.txt')
         thing3 = os.path.join(dataDirectory, gal + '-s4-folded-rprofiles.txt')
-        joindata(thing1, thing2, thing3, os.path.join(outputDirectory, gal + '-folded-data.txt'))
+        joindata(thing1, thing2, thing3, os.path.join(outputDirectory, gal + '-folded-moments.txt'))
 
 if __name__ == '__main__':
     test()
