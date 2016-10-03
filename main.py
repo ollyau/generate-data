@@ -40,18 +40,25 @@ def main():
     else:
         raise ValueError('invalid argument input')
 
+def _missingfiles(outputdir, gal):    
+    return all([
+        os.path.isfile(os.path.join(outputdir, gal, gal + '-folded-moments.txt')),
+        os.path.isfile(os.path.join(outputdir, gal, gal + '-folded-spectra.fits')),
+        os.path.isfile(os.path.join(outputdir, gal, gal + '-folded-misc.txt'))
+    ])
+
 def processlocal(args):
     datadir = args['directory']
     outputdir = args['output']
 
     files = os.listdir(datadir)
-    search = re.compile(r'^(?:NGC|UGC)\d+$').search
+    search = re.compile(r'^[A-Z]+\d+$').search
     galaxies = sorted(set(m.group(0) for m in (search(f) for f in files) if m))
 
     if args['skipcompleted'] is not None:
-        search1 = re.compile(r'^((?:NGC|UGC)\d+)\.(?:txt|fits)$').search
-        completedfiles = os.listdir(outputdir)
-        completed = set(m.group(1) for m in (search1(f) for f in completedfiles) if m)
+        completedgals = os.listdir(outputdir)
+        completed = set(m.group(0) for m in (search(f) for f in completedgals) if m)
+        completed = [x for x in completed if not _missingfiles(outputdir, x)]
         galaxies = galaxies.difference(completed)
 
     if args['include'] is not None:
@@ -61,9 +68,6 @@ def processlocal(args):
     if args['exclude'] is not None:
         exclude = [x.strip() for x in args['exclude'].split(',') if x and not x.isspace()]
         galaxies = galaxies.difference(exclude)
-
-    if not os.path.exists(outputdir):
-        os.makedirs(outputdir)
 
     for g in galaxies:
         filesdir = os.path.join(datadir, g, 'kinematics_paperversion', 'more_files')
@@ -77,9 +81,14 @@ def processlocal(args):
         s4_folded_rprofiles = os.path.join(filesdir, g + '-s4-folded-rprofiles.txt')
         s2_params = os.path.join(filesdir, g + '_s2_params.txt')
 
-        with open(os.path.join(outputdir, g + '-folded-moments.txt'), 'wb') as data_output, \
-             open(os.path.join(outputdir, g + '-folded-spectra.fits'), 'wb') as fits_output, \
-             open(os.path.join(outputdir, g + '-folded-misc.txt'), 'wb') as meta_output:
+        galdir = os.path.join(outputdir, g)
+
+        if not os.path.exists(galdir):
+            os.makedirs(galdir)
+
+        with open(os.path.join(galdir, g + '-folded-moments.txt'), 'wb') as data_output, \
+             open(os.path.join(galdir, g + '-folded-spectra.fits'), 'wb') as fits_output, \
+             open(os.path.join(galdir, g + '-folded-misc.txt'), 'wb') as meta_output:
 
             joindata(s2_folded_bininfo, s3_B_folded_moments, s4_folded_rprofiles, data_output)
             createfits(s2_folded_binspectra, s2_folded_fullgalaxy, s2_folded_bininfo, s3_B_folded_moments, s4_folded_rprofiles, fits_output)
@@ -104,23 +113,22 @@ def processbox(args):
     client = Client(oauth)
     root = client.folder('0')
 
-    dataitems = _getboxitems(root, r'Test/Reduced-Data')
-    search = re.compile(r'^(?:NGC|UGC)\d+$').search
+    dataitems = _getboxitems(root, r'Test/Reduced-Data')    
+    search = re.compile(r'^[A-Z]+\d+$').search
 
     # create output folder
     rootdirs = root.get_items(100)
     try:
-        outputfolder = next(x for x in rootdirs if x.name == 'Output')
+        rootoutputfolder = next(x for x in rootdirs if x.name == 'Output')
     except StopIteration:
-        outputfolder = root.create_subfolder('Output')
+        rootoutputfolder = root.create_subfolder('Output')
 
-    previousoutput = outputfolder.get_items(400)
+    previousgalfolders = rootoutputfolder.get_items(400) # fix
 
     galaxies = set(m.group(0) for m in (search(g.name) for g in dataitems) if m)
 
     if args['skipcompleted'] is not None:
-        search1 = re.compile(r'^((?:NGC|UGC)\d+)\.(?:txt|fits)$').search
-        completed = set(m.group(1) for m in (search1(g.name) for g in previousoutput) if m)
+        completed = set(m.group(0) for m in (search(g.name) for g in previousgalfolders) if m)
         galaxies = galaxies.difference(completed)
 
     if args['include'] is not None:
@@ -222,6 +230,15 @@ def processbox(args):
             meta_output.seek(0)
 
             print('uploading new data for {0}'.format(g))
+            
+            # create output folder
+            galdirs = rootoutputfolder.get_items(400)
+            try:
+                outputfolder = next(x for x in galdirs if x.name == g)
+            except StopIteration:
+                outputfolder = rootoutputfolder.create_subfolder('Output')
+
+            previousoutput = outputfolder.get_items(10)
 
             dataname = g + '-folded-moments.txt'
             try:

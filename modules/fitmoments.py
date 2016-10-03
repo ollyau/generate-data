@@ -47,7 +47,7 @@ def get_sigfits(moments, bininfo, d):
     pPL, chisqPL = fit_pl(r_kpc,moments['sigma'],moments['sigmaerr'])
     items['sigPL_s0'] = pPL[0]
     items['sigPL_g2'] = pPL[1]
-    items['sigPL_x2'] = chisqPL    
+    items['sigPL_x2'] = chisqPL
     return items
 
 def get_h4fits(moments, bininfo, d):

@@ -52,7 +52,7 @@ def joindata(bininfopath, momentspath, rprofilespath, outputPath):
             })
 
     rprofiles = np.genfromtxt(rprofilespath,dtype=None,names=True,skip_header=1)
-        
+
     annuli = np.searchsorted(rprofiles['r_en'],bininfo['r'])
     r_check = np.zeros(len(rprofiles))
     for i in range(max(annuli)+1):
@@ -61,7 +61,7 @@ def joindata(bininfopath, momentspath, rprofilespath, outputPath):
         r_check[i] = np.average(bininfo['r'][ii],weights=lum)
     if not all(np.isclose(r_check,rprofiles['r'])):
         raise RuntimeError('WARNING, YOUR ANNULI ARE WRONG')
-    
+
     newdata = np.column_stack((
         bininfo['binid'],
         bininfo['nfibers'],
