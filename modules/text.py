@@ -16,7 +16,9 @@ def _getheaderfmt(i, fmt):
 def joindata(bininfopath, momentspath, rprofilespath, outputPath):
     columns = [
         ('bin', '%5d'),
-        ('sf', '%2d'),
+        ('nf', '%4d'),
+        ('an', '%3d'),
+        ('flux', '%10.1f'),
         ('r', '%6.2f'),
         ('th', '%7.2f'),
         ('V', '%8.2f'),
@@ -49,9 +51,22 @@ def joindata(bininfopath, momentspath, rprofilespath, outputPath):
             'formats':['i4'] + 12 * ['f8']
             })
 
+    rprofiles = np.genfromtxt(rprofilespath,dtype=None,names=True,skip_header=1)
+        
+    annuli = np.searchsorted(rprofiles['r_en'],bininfo['r'])
+    r_check = np.zeros(len(rprofiles))
+    for i in range(max(annuli)+1):
+        ii = (annuli==i)
+        lum = bininfo['nfibers'][ii]*bininfo['flux'][ii]
+        r_check[i] = np.average(bininfo['r'][ii],weights=lum)
+    if not all(np.isclose(r_check,rprofiles['r'])):
+        raise Exception('WARNING, YOUR ANNULI ARE WRONG')
+    
     newdata = np.column_stack((
         bininfo['binid'],
-        [1 if np.isnan(x) else 0 for x in bininfo['rmin']],
+        bininfo['nfibers'],
+        annuli,
+        bininfo['flux'],
         bininfo['r'],
         bininfo['th'],
         moments['V'],
@@ -73,10 +88,10 @@ def joindata(bininfopath, momentspath, rprofilespath, outputPath):
         bincount = len(newdata)
         newdata = np.delete(newdata, range(bincount - junkbins, bincount), 0)
 
-    v = newdata[:, 4]
+    v = newdata[:, 6]
     if np.any(v > 9999) or np.any(v < -9999):
         print('warning: value for V exceeds 9999 or is below -9999')
-    sigma = newdata[:, 6]
+    sigma = newdata[:, 8]
     if np.any(sigma > 999) or np.any(sigma < 0):
         print('warning: value for sigma exceeds 999 or is negative')
 

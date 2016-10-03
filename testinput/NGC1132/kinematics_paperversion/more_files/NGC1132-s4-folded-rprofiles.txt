@@ -1,0 +1,47 @@
+# Columns are as follows...
+#  r r_en sig_loc sig_en sig_loc_err lam_loc lam_loc_vmin lam_loc_vmax lam_en lam_en_vmin lam_en_vmax
+# Metadata is as follows...
+#                 gal ba: 0.63
+#                 gal re: 30.9
+#             h3 average: 0.0099696
+#                 h3 err: 0.0317359568004
+#           h3 intercept: 0.0123616437286
+#       h3 intercept err: 0.0128944985316
+#               h3 slope: 0.0543765842845
+#           h3 slope err: 0.137229308264
+#             h4 average: 0.0037475
+#                 h4 err: 0.0322040211503
+#           h4 intercept: 0.00432126738119
+#       h4 intercept err: 0.00724494488385
+#               h4 slope: -0.506910870924
+#           h4 slope err: 0.17345984366
+#             h5 average: 0.0572599
+#                 h5 err: 0.0622761956231
+#             h6 average: 0.0539631
+#                 h6 err: 0.029499487292
+#                is slow: 1
+#              junk bins: 0
+#         lambda half re: 0.0666734880935
+#              lambda re: 0.0611352820424
+#       sigma anisotropy: 0.0328530718585
+#           sigma center: 238.893376
+#          sigma half re: 221.89372427
+#               sigma re: 218.053503064
+#       slow/fast cutoff: 0.188565638439
+#              v0_binavg: 60.6250333
+#              v0_binmed: 60.674671
+#            v0_fiducial: 66.9899500989
+#              v0_full-1: 66.9899500989
+#              v0_full-2: 63.5187833681
+#             v0_wbinavg: 65.9087789709
+#             v0_wbinmed: 72.06208
+# Additional comments...
+#  Radial profiles have both local ("loc") and cumulative/enclosed ("en") versions
+#  Lambda profiles are also calculated with min and max V0 to verify that no major differences
+#  Included in metadata are (unweighted) averages and standard deviations of h3-h6
+#  H3 and h4 slopes and intercepts are from bootstrapped linear fits of h3/V and h4/sigma correlations
+#  Sigma anisotropy is the maximum relative deviation of sigma within an annulus
+  2.14642	  2.80878	237.50347	237.50347	  1.45355	  0.06266	  0.06936	  0.05728	  0.06266	  0.06936	  0.05728
+  4.86268	  6.82412	222.05351	228.73770	  7.29514	  0.08303	  0.08446	  0.09166	  0.07766	  0.08048	  0.08262
+ 13.61908	 21.87157	209.47546	216.79870	  5.73045	  0.05504	  0.05652	  0.05384	  0.05849	  0.06017	  0.05823
+ 38.43197	 76.88612	233.77370	224.44482	  1.99460	  0.07916	  0.08251	  0.07644	  0.07460	  0.07758	  0.07242

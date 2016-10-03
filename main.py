@@ -3,11 +3,19 @@ import os
 import re
 from io import BytesIO
 
-from boxsdk import Client, OAuth2
+try:
+    from boxsdk import Client, OAuth2
+except Exception as e:
+    print '\n=================='
+    print 'Error in imports: ',e
+    print '------------------'
+    print ('Everything will run fine as long as you are not'
+           ' trying to use the Box API')
+    print '==================\n'
 
-from fits import createfits
-from metadata import writemeta
-from text import joindata
+from modules.fits import createfits
+from modules.metadata import writemeta
+from modules.text import joindata
 
 def main():
     parser = argparse.ArgumentParser(description='Creates public data from MASSIVE survey reduced data.')
@@ -75,7 +83,7 @@ def processlocal(args):
 
             joindata(s2_folded_bininfo, s3_B_folded_moments, s4_folded_rprofiles, data_output)
             createfits(s2_folded_binspectra, s2_folded_fullgalaxy, s2_folded_bininfo, s3_B_folded_moments, s4_folded_rprofiles, fits_output)
-            writemeta(s2_folded_bininfo, s3_A_folded_temps_1, s3_A_folded_temps_2, s2_params, meta_output)
+            writemeta(s2_folded_bininfo, s3_A_folded_temps_1, s3_A_folded_temps_2, s2_params, s3_B_folded_moments, meta_output)
 
 def _getboxitems(f, relpath):
     dirs = [d for d in re.split(r'[\\/]+', relpath) if d is not '']
