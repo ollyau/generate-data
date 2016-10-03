@@ -5,7 +5,7 @@ from io import BytesIO
 
 try:
     from boxsdk import Client, OAuth2
-except Exception as e:
+except ImportError as e:
     print '\n=================='
     print 'Error in imports: ',e
     print '------------------'
@@ -77,13 +77,13 @@ def processlocal(args):
         s4_folded_rprofiles = os.path.join(filesdir, g + '-s4-folded-rprofiles.txt')
         s2_params = os.path.join(filesdir, g + '_s2_params.txt')
 
-        with open(os.path.join(outputdir, g + '.txt'), 'wb') as data_output, \
-             open(os.path.join(outputdir, g + '.fits'), 'wb') as fits_output, \
-             open(os.path.join(outputdir, g + '_meta.txt'), 'wb') as meta_output:
+        with open(os.path.join(outputdir, g + '-folded-moments.txt'), 'wb') as data_output, \
+             open(os.path.join(outputdir, g + '-folded-spectra.fits'), 'wb') as fits_output, \
+             open(os.path.join(outputdir, g + '-folded-misc.txt'), 'wb') as meta_output:
 
             joindata(s2_folded_bininfo, s3_B_folded_moments, s4_folded_rprofiles, data_output)
             createfits(s2_folded_binspectra, s2_folded_fullgalaxy, s2_folded_bininfo, s3_B_folded_moments, s4_folded_rprofiles, fits_output)
-            writemeta(s2_folded_bininfo, s3_A_folded_temps_1, s3_A_folded_temps_2, s2_params, s3_B_folded_moments, meta_output)
+            writemeta(s2_folded_bininfo, s3_A_folded_temps_1, s3_A_folded_temps_2, s2_params, s3_B_folded_moments, s4_folded_rprofiles, meta_output)
 
 def _getboxitems(f, relpath):
     dirs = [d for d in re.split(r'[\\/]+', relpath) if d is not '']
@@ -204,14 +204,18 @@ def processbox(args):
             s2_folded_binspectra.seek(0)
             s2_folded_fullgalaxy.seek(0)
             s2_folded_bininfo.seek(0)
+            s3_B_folded_moments.seek(0)
             s4_folded_rprofiles.seek(0)
             createfits(s2_folded_binspectra, s2_folded_fullgalaxy, s2_folded_bininfo, s3_B_folded_moments, s4_folded_rprofiles, fits_output)
 
             print('creating metadata file for {0}'.format(g))
             s2_folded_bininfo.seek(0)
+            s2_params.seek(0)
             s3_A_folded_temps_1.seek(0)
             s3_A_folded_temps_2.seek(0)
-            writemeta(s2_folded_bininfo, s3_A_folded_temps_1, s3_A_folded_temps_2, s2_params, meta_output)
+            s3_B_folded_moments.seek(0)
+            s4_folded_rprofiles.seek(0)
+            writemeta(s2_folded_bininfo, s3_A_folded_temps_1, s3_A_folded_temps_2, s2_params, s3_B_folded_moments, s4_folded_rprofiles, meta_output)
 
             data_output.seek(0)
             fits_output.seek(0)
@@ -219,21 +223,21 @@ def processbox(args):
 
             print('uploading new data for {0}'.format(g))
 
-            dataname = g + '.txt'
+            dataname = g + '-folded-moments.txt'
             try:
                 dest = next(x for x in previousoutput if x.name == dataname)
                 dest.update_contents_with_stream(data_output)
             except StopIteration:
                 outputfolder.upload_stream(data_output, dataname)
 
-            fitsname = g + '.fits'
+            fitsname = g + '-folded-spectra.fits'
             try:
                 dest = next(x for x in previousoutput if x.name == fitsname)
                 dest.update_contents_with_stream(fits_output)
             except StopIteration:
                 outputfolder.upload_stream(fits_output, fitsname)
 
-            metaname = g + '_meta.txt'
+            metaname = g + '-folded-misc.txt'
             try:
                 dest = next(x for x in previousoutput if x.name == metaname)
                 dest.update_contents_with_stream(meta_output)

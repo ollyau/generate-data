@@ -1,3 +1,4 @@
+from collections import OrderedDict
 import numpy as np
 
 # This is pasted from massivepy.postprocess
@@ -8,7 +9,7 @@ def group_bins(bindata,n0=3):
     equal radius, based on having n0 as the number of bins in the "first"
     (center) annulus, and having the total number of bins enclosed in the nth
     annulus scale like n^2.
-    E.g. for n0=3 the total number of bins enclosed goes 3, 12, 27, 48 etc, 
+    E.g. for n0=3 the total number of bins enclosed goes 3, 12, 27, 48 etc,
     so the number in each annulus goes 3, 9, 15, 21, etc.
     Note that the final annulus in the center region will have slightly more
     or fewer bins/fibers than this.
@@ -44,8 +45,9 @@ def get_re_averages(moments, bininfo, re):
         for key in ['sigma','h3','h4','h5','h6']:
             endata[key][j] = np.average(bm[key],weights=lum)
             endata[key+'err'][j] = np.average(bm[key+'err'],weights=lum)/sqrtN
-    items = {}
+    items = OrderedDict()
     for key in ['sigma','h3','h4','h5','h6']:
-        items['re_avg'+key] = np.interp(re,endata['r'],endata[key])
-        items['re_avg'+key+'err'] = np.interp(re,endata['r'],endata[key+'err'])
+        k = 'sig' if key == 'sigma' else key
+        items[k+'avg'] = np.interp(re,endata['r'],endata[key])
+        items[k+'avge'] = np.interp(re,endata['r'],endata[key+'err'])
     return items

@@ -1,3 +1,4 @@
+from collections import OrderedDict
 import numpy as np
 from scipy.optimize import curve_fit
 
@@ -37,20 +38,19 @@ def fit_pl(rdata,sigdata,sigerrs):
 
 def get_sigfits(moments, bininfo, d):
     r_kpc = arcsec_to_kpc(bininfo['r'],float(d)*1e3)
-    items = {}
+    items = OrderedDict()
     pBR, chisqBR = fit_broken(r_kpc,moments['sigma'],moments['sigmaerr'])
-    items['sigBR_sig0'] = pBR[0]
-    items['sigBR_gamma1'] = pBR[1]
-    items['sigBR_gamma2'] = pBR[2]
-    items['sigBR_chisq'] = chisqBR
+    items['sigBR_s0'] = pBR[0]
+    items['sigBR_g1'] = pBR[1]
+    items['sigBR_g2'] = pBR[2]
+    items['sigBR_x2'] = chisqBR
     pPL, chisqPL = fit_pl(r_kpc,moments['sigma'],moments['sigmaerr'])
-    items['sigPL_sig0'] = pPL[0]
-    items['sigPL_gamma'] = pPL[1]
-    items['sigPL_chisq'] = chisqPL    
+    items['sigPL_s0'] = pPL[0]
+    items['sigPL_g2'] = pPL[1]
+    items['sigPL_x2'] = chisqPL    
     return items
 
 def get_h4fits(moments, bininfo, d):
     rphys = arcsec_to_kpc(bininfo['r'],float(d)*1e3)
     p = np.polyfit(np.log10(rphys),moments['h4'],1,w=1/moments['h4err'])
-    items = {'h4grad':p[0], 'h4intercept':p[1]}
-    return items
+    return OrderedDict([('h4rgrad', p[0]), ('h4rint', p[1])])
