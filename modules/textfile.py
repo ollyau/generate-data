@@ -13,7 +13,7 @@ def _getheaderfmt(i, fmt):
     val = m.group(1) if i > 0 else int(m.group(1)) - 2
     return '{{{0}:>{1}}}'.format(i, val)
 
-def joindata(bininfopath, momentspath, rprofilespath, outputPath):
+def writetext(bininfopath, momentspath, rprofilespath, outputPath):
     columns = [
         ('bin', '%5d'),
         ('nf', '%4d'),

@@ -2,9 +2,9 @@ import argparse
 import os
 import re
 
-from modules.fits import createfits
-from modules.metadata import writemeta
-from modules.text import joindata
+from modules.textfile import writetext
+from modules.fitsfile import writefits
+from modules.metafile import writemeta
 
 
 def _outputpathlist(outputdir, gal):
@@ -36,9 +36,9 @@ def _processgal(inputdir, outputdir, gal):
     with open(outputpaths[0], 'wb') as data_output, \
          open(outputpaths[1], 'wb') as fits_output, \
          open(outputpaths[2], 'wb') as meta_output:
-        joindata(s2_bininfo, s3_B_moments, s4_rprofiles, data_output)
-        createfits(s2_binspectra, s2_fullgalaxy, s2_bininfo, s3_B_moments,
-                   s4_rprofiles, fits_output)
+        writetext(s2_bininfo, s3_B_moments, s4_rprofiles, data_output)
+        writefits(s2_binspectra, s2_fullgalaxy, s2_bininfo, s3_B_moments,
+                  s4_rprofiles, fits_output)
         writemeta(s2_bininfo, s3_A_temps_1, s3_A_temps_2, s2_params,
                   s3_B_moments, s4_rprofiles, meta_output)
     

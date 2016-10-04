@@ -93,19 +93,5 @@ def writemeta(fbininfo, ftemps1, ftemps2, fs2params, fbinmoments, frprofiles, ou
     items.update(get_h4fits(binmoments,bindata,bininfo.metadata['gal d']))
 
     width = max(len(str(k)) for k in items.keys())
-    output.write('\n'.join('# {1:>{0}}: {2}'.format(width, k, v) for k, v in items.iteritems()))
-
-def test():
-    with open(r'..\..\Output\test1234.txt', 'w') as output:
-        writemeta(
-            r'..\testinput\NGC1132\kinematics_paperversion\more_files\NGC1132-s2-folded-bininfo.txt',
-            r'..\testinput\NGC1132\kinematics_paperversion\more_files\NGC1132-s3-A-folded-temps-1.txt',
-            r'..\testinput\NGC1132\kinematics_paperversion\more_files\NGC1132-s3-A-folded-temps-2.txt',
-            r'..\testinput\NGC1132\kinematics_paperversion\more_files\NGC1132_s2_params.txt',
-            r'..\testinput\NGC1132\kinematics_paperversion\more_files\NGC1132-s3-B-folded-moments.txt',
-            r'..\testinput\NGC1132\kinematics_paperversion\more_files\NGC1132-s4-folded-rprofiles.txt',
-            output
-            )
-
-if __name__ == '__main__':
-    test()
+    output.write('\n'.join('{1:>{0}}: {2}'.format(width, k, v)
+                           for k, v in items.iteritems()))
