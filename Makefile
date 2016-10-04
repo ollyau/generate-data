@@ -1,2 +1,2 @@
 test1:
-	python main.py -d testinput -o testoutput
+	python process_local.py -d testinput -o testoutput
