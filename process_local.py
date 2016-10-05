@@ -14,7 +14,7 @@ def _outputpathlist(outputdir, gal):
     return [os.path.join(outputdir, gal, gal + e) for e in file_endings]
     
 def _missingfiles(outputdir, gal):
-    return all([os.path.isfile(f) for f in _outputpathlist(outputdir, gal)])
+    return not all([os.path.isfile(f) for f in _outputpathlist(outputdir, gal)])
 
 def _processgal(inputdir, outputdir, gal):
     galdir_in = os.path.join(inputdir, gal, 'kinematics_paperversion',
@@ -62,7 +62,7 @@ def main():
     parser.add_argument('-e', '--exclude',
                         help='Comma separated list of galaxies to exclude.')
 
-    parser.add_argument('-skip', '--skipcompleted',
+    parser.add_argument('-skip', '--skipcompleted', action='store_true',
                         help='Skips galaxies that were previously processed.')
 
     args = vars(parser.parse_args())
@@ -73,9 +73,9 @@ def main():
 
     files = os.listdir(datadir)
     search = re.compile(r'^[A-Z]+\d+$').search
-    galaxies = sorted(set(m.group(0) for m in (search(f) for f in files) if m))
+    galaxies = set(m.group(0) for m in (search(f) for f in files) if m)
 
-    if args['skipcompleted'] is not None:
+    if args['skipcompleted']:
         alldirs = os.listdir(outputdir)
         galdirs = set(m.group(0) for m in (search(f) for f in alldirs) if m)
         completed = [x for x in galdirs if not _missingfiles(outputdir, x)]
@@ -91,7 +91,7 @@ def main():
                    if x and not x.isspace()]
         galaxies = galaxies.difference(exclude)
 
-    for g in galaxies:
+    for g in sorted(galaxies):
         print 'Processing {}'.format(g)
         _processgal(datadir, outputdir, g)
 
