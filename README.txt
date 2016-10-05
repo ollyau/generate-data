@@ -19,9 +19,11 @@ A detailed explanation of each file:
 
 1) NGC0000-folded-misc.txt:
 --------------------
-The full list of parameters is below, broken up into sections. The basic parameters are the same as given in Table 1 of Paper V; see that table for notes and caveats. The full galaxy spectrum parameters represent two different choices for generating a composite spectrum; full spectrum 1 contains all binned fibers, while full spectrum 2 contains fibers within some smaller radius, chosen to minimize asymmetry due to masked neighbors or other data issues.
+The full list of parameters is below, broken up into sections. The basic parameters are the same as given in Table 1 of Paper V; see that table for notes and caveats. The full galaxy spectrum parameters represent two different choices for generating a composite spectrum; full spectrum 1 contains all fibers, while full spectrum 2 contains fibers within some smaller radius, chosen to minimize asymmetry due to masked neighbors or other issues.
 
---Basic parameters:
+#
+# Basic parameters:
+#
 date			ISO 8601 timestamp of when files were generated (UTC)
 ra	(degrees)	Right Ascension
 dec	(degrees)	Declination
@@ -30,12 +32,14 @@ mk	(mag)		K-band magnitude
 re	(arcsec)	Effective Radius
 eps			Ellipticity
 pa	(deg E of N)	Photometric Axis
-pakin	(deg E of N)	axis used for folding		# usually matches pa, BUT
+pakin	(deg E of N)	axis used for folding (usually matches PA but not always)
 rmax	(Re)		maximum extent of binned data
 env			BGG, Satellite, or Isolated
-envN			number of neighbors in HDC
+envN			number of neighbors in 2MRS HDC
 
---Full galaxy spectrum parameters:
+#
+# Full galaxy spectrum parameters:
+#
 f1rad	(arcsec)	max radius of full spectrum 1
 f1v	(km/s)		V of full spectrum 1
 f1sig	(km/s)		sigma of full spectrum 1
@@ -51,35 +55,38 @@ f2h4			h4 of full spectrum 2
 f2h5			h5 of full spectrum 2
 f2h6			h6 of full spectrum 2
 
---Averages over galaxy (within effective radius; flux-weighted)
+#
+# Averages over galaxy (within effective radius; flux-weighted)
+#
 sigc	(km/s)		not an average; sigma of central fiber
-sigavg	(km/s)
-sigavge	(km/s)
-h3avg
-h3avge
-h4avg
-h4avge
-h5avg
-h5avge
-h6avg
-h6avge
+sigavg	(km/s)		average sigma
+sigavge	(km/s)		error on average sigma (statistical only)
+h3avg			average h3
+h3avge			error on average h3 (statistical only)
+h4avg			average h4
+h4avge			error on average h4 (statistical only)
+h5avg			average h5
+h5avge			error on average h5 (statistical only)
+h6avg			average h6
+h6avge			error on average h6 (statistical only)
 lam			lambda within Re
-rot			Fast, Unclassified, or Slow
 
---Best-fit parameters
-sigBRs0			sigma0 for broken fit
-sigBRg1			gamma1 for broken fit
-sigBRg2			gamma2 for broken fit
-sigBRx2			chisq per dof for broken fit
+#
+# Best-fit parameters
+#
+sigBRs0			sigma0 for broken powerlaw fit
+sigBRg1			gamma1 for broken powerlaw fit
+sigBRg2			gamma2 for broken powerlaw fit
+sigBRx2			chisq per dof for broken powerlaw fit
 sigPLs0			sigma0 for single powerlaw fit
-sigPLg2			gamma2 for single powerlaw fit
+sigPLg2			gamma2 for single powerlaw fit (gamma1=gamma2)
 sigPLx2			chisq per dof for single powerlaw fit
 h3vgrad			slope of h3 vs v/sigma
-h3vgrade		slope of h3 vs v/sigma
+h3vgrade		error on slope of h3 vs v/sigma
 h3vint			intercept of h3 vs v/sigma
-h3vinte			intercept of h3 vs v/sigma
-h4rgrad			gradient of h4 profile (see ??)
-h4rint			intercept of h4 profile (see ??)
+h3vinte			error on intercept of h3 vs v/sigma
+h4rgrad			slope of h4 vs log r
+h4rint			intercept of h4 vs log r
 
 2) NGC0000-folded-moments.txt:
 -----------------------

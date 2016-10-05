@@ -32,65 +32,90 @@ def _read_s2_params(fname):
         stream.close()
     return float(fullbin_radius.group(1))
 
-def writemeta(fbininfo, ftemps1, ftemps2, fs2params, fbinmoments, frprofiles, output):
-    items = OrderedDict()
-
-    bininfo = header(fbininfo)
-    rprofiles = header(frprofiles)
-    moments = _readTempsMoments(ftemps1), _readTempsMoments(ftemps2)
-    fullbin_radius = _read_s2_params(fs2params)
-    binmoments = np.genfromtxt(fbinmoments,names=True,skip_header=1)
-    bindata = np.genfromtxt(fbininfo,names=True,skip_header=1)
-
-    rmax = np.genfromtxt(fbininfo, usecols=8)
-    junkbincount = int(rprofiles.metadata['junk bins'])
-
-    gal_bgg = bininfo.metadata['gal bgg']
-    gal_env = int(bininfo.metadata['gal env'])
-    gal_mhalo = float(bininfo.metadata['gal mhalo'])
-    if gal_bgg == 'True':
+def _env_logic(binmeta):
+    gal_bgg = binmeta.metadata['gal bgg']
+    gal_env = int(binmeta.metadata['gal env'])
+    gal_mhalo = float(binmeta.metadata['gal mhalo'])
+    if gal_bgg == 'True' and gal_env > 1:
         env = 'BGG'
-    elif gal_env > 1:
+    elif gal_bgg == 'False' and gal_env > 1:
         env = 'Satellite'
     elif gal_env == 1:
         env = 'Isolated'
     else:
-        raise RuntimeError('unable to determine env (gal bgg = {0}; gal env = {1}; gal mhalo = {2})'.format(gal_bgg, gal_env, gal_mhalo))
+        msg = ('unable to determine env '
+               '(gal bgg = {0}; gal env = {1}; gal mhalo = {2})'
+               ''.format(gal_bgg, gal_env, gal_mhalo))
+        raise RuntimeError(msg)
+    return env
+
+def writemeta(output, bininfo_path, temps1_path, temps2_path, s2params_path,
+              moments_path, rprofiles_path):
+    keywidth = 8
+
+    binmeta = header(bininfo_path)
+    bininfo = np.genfromtxt(bininfo_path,names=True,skip_header=1)
+    fullmoments = _readTempsMoments(temps1_path), _readTempsMoments(temps2_path)
+    moments = np.genfromtxt(moments_path,names=True,skip_header=1)
+    rmeta = header(rprofiles_path)
+
+    fullbin_radius = {'f2': _read_s2_params(s2params_path),
+                      'f1': np.nanmax(bininfo['rmax'])}
+
+    junkbincount = int(rmeta.metadata['junk bins'])
+    if junkbincount > 0:
+        bininfo = bininfo[:-junkbincount]
+        moments = moments[:-junkbincount]
+
 
     # Basic parameters
+    output.write('#\n# Basic parameters\n#\n')
+    items = OrderedDict()
     items['date'] = datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
-    items['ra'] = bininfo.metadata['gal ra']
-    items['dec'] = bininfo.metadata['gal dec']
-    items['d'] = bininfo.metadata['gal d']
-    items['mk'] = bininfo.metadata['gal mk']
-    items['re'] = bininfo.metadata['gal re']
-    items['eps'] = 1.0 - float(bininfo.metadata['gal ba'])
-    items['pa'] = bininfo.metadata['gal pa']
-    items['pakin'] = bininfo.metadata['gal pa']
-    items['rmax'] = rmax[-1 - junkbincount] / float(bininfo.metadata['gal re']) # highest after throwing away junk bins
-    items['env'] = env
-    items['envN'] = bininfo.metadata['gal env']
+    items['ra'] = binmeta.metadata['gal ra']
+    items['dec'] = binmeta.metadata['gal dec']
+    items['d'] = binmeta.metadata['gal d']
+    items['mk'] = binmeta.metadata['gal mk']
+    items['re'] = binmeta.metadata['gal re']
+    items['eps'] = 1.0 - float(binmeta.metadata['gal ba'])
+    items['pa'] = binmeta.metadata['gal pa']
+    items['pakin'] = binmeta.metadata['gal pa']
+    items['rmax'] = (np.nanmax(bininfo['rmax'])
+                     / float(binmeta.metadata['gal re']))
+    items['env'] = _env_logic(binmeta)
+    items['envN'] = binmeta.metadata['gal env']
+    output.write('\n'.join('{1:>{0}}: {2}'.format(keywidth, k, v)
+                           for k, v in items.iteritems()))
+
 
     # Full galaxy spectrum parameters
-    # f1rad is highest r (including junk bins)
-    for i, gal in enumerate(['f1', 'f2']):
-        items['{0}rad'.format(gal)] = rmax[-1] if i == 0 else fullbin_radius
+    output.write('\n#\n# Full galaxy spectrum parameters\n#\n')
+    items = OrderedDict()
+    for i, f in enumerate(['f1', 'f2']):
+        items['{0}rad'.format(f)] = fullbin_radius[f]
         for j, moment in enumerate(['v', 'sig', 'h3', 'h4', 'h5', 'h6']):
-            items['{0}{1}'.format(gal, moment)] = moments[i][j]
+            items['{0}{1}'.format(f, moment)] = fullmoments[i][j]
+    output.write('\n'.join('{1:>{0}}: {2}'.format(keywidth, k, v)
+                           for k, v in items.iteritems()))
 
     # Averages over galaxy (within effective radius; flux-weighted)
-    items['sigc'] = binmoments['sigma'][0]
-    items.update(get_re_averages(binmoments,bindata,bininfo.metadata['gal re']))
-    items['lam'] = rprofiles.metadata['lambda re']
-    items['rot'] = 'Slow' if int(rprofiles.metadata['is slow']) == 1 else 'Fast' if float(rprofiles.metadata['lambda re']) > 0.2 else 'Unclassified'
+    output.write('\n#\n# Averages over galaxy\n#\n')
+    items = OrderedDict()
+    items['sigc'] = moments['sigma'][0]
+    items.update(get_re_averages(moments,bininfo,binmeta.metadata['gal re']))
+    items['lam'] = rmeta.metadata['lambda re']
+    output.write('\n'.join('{1:>{0}}: {2}'.format(keywidth, k, v)
+                           for k, v in items.iteritems()))
 
     # Best-fit parameters
-    items.update(get_sigfits(binmoments,bindata,bininfo.metadata['gal d']))
-    items['h3vgrad'] = rprofiles.metadata['h3 slope']
-    items['h3vgrade'] = rprofiles.metadata['h3 slope err']
-    items['h3vint'] = rprofiles.metadata['h3 intercept']
-    items['h3vinte'] = rprofiles.metadata['h3 intercept err']
-    items.update(get_h4fits(binmoments,bindata,bininfo.metadata['gal d']))
+    output.write('\n#\n# Best-fit parameters\n#\n')
+    items = OrderedDict()
+    items.update(get_sigfits(moments,bininfo,binmeta.metadata['gal d']))
+    items['h3vgrad'] = rmeta.metadata['h3 slope']
+    items['h3vgrade'] = rmeta.metadata['h3 slope err']
+    items['h3vint'] = rmeta.metadata['h3 intercept']
+    items['h3vinte'] = rmeta.metadata['h3 intercept err']
+    items.update(get_h4fits(moments,bininfo,binmeta.metadata['gal d']))
 
     width = max(len(str(k)) for k in items.keys())
     output.write('\n'.join('{1:>{0}}: {2}'.format(width, k, v)

@@ -1,4 +1,7 @@
-    date: 2016-10-04T22:12:19Z
+#
+# Basic parameters
+#
+    date: 2016-10-05T00:40:42Z
       ra: 264.3892
      dec: 11.1217
        d: 100.2
@@ -10,6 +13,9 @@
     rmax: 2.8129651185
      env: Isolated
     envN: 1
+#
+# Full galaxy spectrum parameters
+#
    f1rad: 70.75994
      f1v: -433.055
    f1sig: 260.036
@@ -24,6 +30,9 @@
     f2h4: 0.017304
     f2h5: 0.00136669
     f2h6: 0.0674177
+#
+# Averages over galaxy
+#
     sigc: 246.559867
   sigavg: 249.081095353
  sigavge: 3.96873031285
@@ -36,7 +45,9 @@
    h6avg: 0.0808840451314
   h6avge: 0.0156195479116
      lam: 0.0342793727692
-     rot: Slow
+#
+# Best-fit parameters
+#
 sigBR_s0: 248.303691762
 sigBR_g1: -0.186150238697
 sigBR_g2: 0.201168097138

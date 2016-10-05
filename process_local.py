@@ -39,8 +39,8 @@ def _processgal(inputdir, outputdir, gal):
         writetext(s2_bininfo, s3_B_moments, s4_rprofiles, data_output)
         writefits(s2_binspectra, s2_fullgalaxy, s2_bininfo, s3_B_moments,
                   s4_rprofiles, fits_output)
-        writemeta(s2_bininfo, s3_A_temps_1, s3_A_temps_2, s2_params,
-                  s3_B_moments, s4_rprofiles, meta_output)
+        writemeta(meta_output, s2_bininfo, s3_A_temps_1, s3_A_temps_2,
+                  s2_params, s3_B_moments, s4_rprofiles)
     
 
 def main():
