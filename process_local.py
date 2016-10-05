@@ -19,6 +19,9 @@ def _missingfiles(outputdir, gal):
 def _processgal(inputdir, outputdir, gal):
     galdir_in = os.path.join(inputdir, gal, 'kinematics_paperversion',
                              'more_files')
+    if not os.path.isdir(galdir_in):
+        print 'No paperversion for {}, skipping to next galaxy'.format(gal)
+        return
     s2_binspectra = os.path.join(galdir_in, gal + '-s2-folded-binspectra.fits')
     s2_fullgalaxy = os.path.join(galdir_in, gal + '-s2-folded-fullgalaxy.fits')
     s2_bininfo = os.path.join(galdir_in, gal + '-s2-folded-bininfo.txt')
@@ -89,6 +92,7 @@ def main():
         galaxies = galaxies.difference(exclude)
 
     for g in galaxies:
+        print 'Processing {}'.format(g)
         _processgal(datadir, outputdir, g)
 
 if __name__ == '__main__':

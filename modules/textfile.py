@@ -9,7 +9,8 @@ def _getheaderfmt(i, fmt):
     r = re.compile(r'^%?(\d+)(?:\.(\d+))?([A-Za-z])$')
     m = r.search(fmt)
     if not m:
-        raise ValueError('input {0} does not appear to be a format string'.format(fmt))
+        msg = 'input {0} does not appear to be a format string'.format(fmt)
+        raise ValueError(msg)
     val = m.group(1) if i > 0 else int(m.group(1)) - 2
     return '{{{0}:>{1}}}'.format(i, val)
 
@@ -23,9 +24,9 @@ def writetext(bininfopath, momentspath, rprofilespath, outputPath):
         ('th', '%7.2f'),
         ('V', '%8.2f'),
         ('Ve', '%7.2f'),
-        ('sig', '%6.2f'),
+        ('sig', '%8.2f'),
         ('sige', '%6.2f'),
-        ('h3', '%7.4f'),
+        ('h3', '%8.4f'),
         ('h3e', '%6.4f'),
         ('h4', '%7.4f'),
         ('h4e', '%6.4f'),
@@ -37,21 +38,14 @@ def writetext(bininfopath, momentspath, rprofilespath, outputPath):
 
     cols, fmts = zip(*columns)
 
-    bininfo = np.genfromtxt(
-        bininfopath,
-        dtype={
-            'names':['binid', 'nfibers', 'flux', 'x', 'y', 'r', 'th', 'rmin', 'rmax', 'thmin', 'thmax'],
-            'formats':2 * ['i4'] + 9 * ['f8']
-            })
-
-    moments = np.genfromtxt(
-        momentspath,
-        dtype={
-            'names':['bin', 'V', 'sigma', 'h3', 'h4', 'h5', 'h6', 'Verr', 'sigmaerr', 'h3err', 'h4err', 'h5err', 'h6err'],
-            'formats':['i4'] + 12 * ['f8']
-            })
-
+    bininfo = np.genfromtxt(bininfopath,dtype=None,names=True,skip_header=1)
+    moments = np.genfromtxt(momentspath,dtype=None,names=True,skip_header=1)
     rprofiles = np.genfromtxt(rprofilespath,dtype=None,names=True,skip_header=1)
+
+    junkbins = int(header(rprofilespath).metadata['junk bins'])
+    if junkbins > 0:
+        bininfo = bininfo[:-junkbins]
+        moments = moments[:-junkbins]
 
     annuli = np.searchsorted(rprofiles['r_en'],bininfo['r'])
     r_check = np.zeros(len(rprofiles))
@@ -83,11 +77,6 @@ def writetext(bininfopath, momentspath, rprofilespath, outputPath):
         moments['h6err']
     ))
 
-    junkbins = int(header(rprofilespath).metadata['junk bins'])
-    if junkbins > 0:
-        bincount = len(newdata)
-        newdata = np.delete(newdata, range(bincount - junkbins, bincount), 0)
-
     v = newdata[:, 6]
     if np.any(v > 9999) or np.any(v < -9999):
         print('warning: value for V exceeds 9999 or is below -9999')
@@ -97,20 +86,3 @@ def writetext(bininfopath, momentspath, rprofilespath, outputPath):
 
     newheader = ' '.join([_getheaderfmt(i, fmt) for i, fmt in enumerate(fmts)])
     np.savetxt(outputPath, newdata, header=newheader.format(*cols), fmt=fmts)
-
-def test():
-    dataDirectory = r'..\testinput\NGC1132\kinematics_paperversion\more_files'
-    outputDirectory = r'..\..\Output\thing'
-    files = os.listdir(dataDirectory)
-
-    search = re.compile(r'^((?:NGC|UGC)\d+).+\.txt$').search
-    galaxies = sorted(set(m.group(1) for m in (search(g) for g in files) if m))
-
-    for gal in galaxies:
-        thing1 = os.path.join(dataDirectory, gal + '-s2-folded-bininfo.txt')
-        thing2 = os.path.join(dataDirectory, gal + '-s3-B-folded-moments.txt')
-        thing3 = os.path.join(dataDirectory, gal + '-s4-folded-rprofiles.txt')
-        joindata(thing1, thing2, thing3, os.path.join(outputDirectory, gal + '-folded-moments.txt'))
-
-if __name__ == '__main__':
-    test()
