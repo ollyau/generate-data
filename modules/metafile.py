@@ -2,7 +2,7 @@ from collections import OrderedDict
 import datetime
 import re
 import numpy as np
-from fitmoments import get_sigfits, get_h4fits
+from dofits import get_sigfits, get_h4fits
 from annuli import get_re_averages
 from utils import header, getstream
 
@@ -49,6 +49,20 @@ def _env_logic(binmeta):
         raise RuntimeError(msg)
     return env
 
+def _fmt(number, style):
+    '''Cleverly formats numbers.
+    Note that 'style' is usually taken from the dict key in below usage.
+    This means it may break if keys get renamed.'''
+    if style=='v': return '{:.2f}'.format(number)   #V
+    elif style=='s': return '{:.2f}'.format(number) #sigma
+    elif style=='h': return '{:.4f}'.format(number) #h3 - h6
+    elif style=='r': return '{:.2f}'.format(number) #radius
+    elif style=='l': return '{:.3f}'.format(number) #lambda
+    elif style=='g': return '{:.3f}'.format(number) #gammas
+    elif style=='x': return '{:.2f}'.format(number) #chisq
+    elif style=='q': return '{:.4f}'.format(number) #all slope/int fits
+    else: raise ValueError('You broke your formatting, try again.')
+
 def writemeta(output, bininfo_path, temps1_path, temps2_path, s2params_path,
               moments_path, rprofiles_path):
     keywidth = 8
@@ -80,8 +94,8 @@ def writemeta(output, bininfo_path, temps1_path, temps2_path, s2params_path,
     items['eps'] = 1.0 - float(binmeta.metadata['gal ba'])
     items['pa'] = binmeta.metadata['gal pa']
     items['pakin'] = binmeta.metadata['gal pa']
-    items['rmax'] = (np.nanmax(bininfo['rmax'])
-                     / float(binmeta.metadata['gal re']))
+    items['rmax'] = _fmt(np.nanmax(bininfo['rmax'])
+                         / float(binmeta.metadata['gal re']), 'r')
     items['env'] = _env_logic(binmeta)
     items['envN'] = binmeta.metadata['gal env']
     output.write('\n'.join('{1:>{0}}: {2}'.format(keywidth, k, v)
@@ -92,30 +106,33 @@ def writemeta(output, bininfo_path, temps1_path, temps2_path, s2params_path,
     output.write('\n#\n# Full galaxy spectrum parameters\n#\n')
     items = OrderedDict()
     for i, f in enumerate(['f1', 'f2']):
-        items['{0}rad'.format(f)] = fullbin_radius[f]
-        for j, moment in enumerate(['v', 'sig', 'h3', 'h4', 'h5', 'h6']):
-            items['{0}{1}'.format(f, moment)] = fullmoments[i][j]
+        items['{0}rad'.format(f)] = _fmt(fullbin_radius[f],'r')
+        for j, mom in enumerate(['v', 'sig', 'h3', 'h4', 'h5', 'h6']):
+            items['{0}{1}'.format(f, mom)] = _fmt(fullmoments[i][j],mom[0])
     output.write('\n'.join('{1:>{0}}: {2}'.format(keywidth, k, v)
                            for k, v in items.iteritems()))
 
     # Averages over galaxy (within effective radius; flux-weighted)
     output.write('\n#\n# Averages over galaxy\n#\n')
     items = OrderedDict()
-    items['sigc'] = moments['sigma'][0]
-    items.update(get_re_averages(moments,bininfo,binmeta.metadata['gal re']))
-    items['lam'] = rmeta.metadata['lambda re']
+    items['sigc'] = _fmt(moments['sigma'][0],'s')
+    avgs = get_re_averages(moments,bininfo,binmeta.metadata['gal re'])
+    items.update((k, _fmt(v,k[0])) for k,v in avgs.iteritems())
+    items['lam'] = _fmt(float(rmeta.metadata['lambda re']),'l')
     output.write('\n'.join('{1:>{0}}: {2}'.format(keywidth, k, v)
                            for k, v in items.iteritems()))
 
     # Best-fit parameters
     output.write('\n#\n# Best-fit parameters\n#\n')
     items = OrderedDict()
-    items.update(get_sigfits(moments,bininfo,binmeta.metadata['gal d']))
-    items['h3vgrad'] = rmeta.metadata['h3 slope']
-    items['h3vgrade'] = rmeta.metadata['h3 slope err']
-    items['h3vint'] = rmeta.metadata['h3 intercept']
-    items['h3vinte'] = rmeta.metadata['h3 intercept err']
-    items.update(get_h4fits(moments,bininfo,binmeta.metadata['gal d']))
+    sigfits = get_sigfits(moments,bininfo,binmeta.metadata['gal d'])
+    items.update((k, _fmt(v,k[-2])) for k,v in sigfits.iteritems())
+    items['h3vgrad'] = _fmt(float(rmeta.metadata['h3 slope']),'q')
+    items['h3vgrade'] = _fmt(float(rmeta.metadata['h3 slope err']),'q')
+    items['h3vint'] = _fmt(float(rmeta.metadata['h3 intercept']),'q')
+    items['h3vinte'] = _fmt(float(rmeta.metadata['h3 intercept err']),'q')
+    h4fits = get_h4fits(moments,bininfo,binmeta.metadata['gal d'])
+    items.update((k, _fmt(v,'q')) for k,v in h4fits.iteritems())
 
     width = max(len(str(k)) for k in items.keys())
     output.write('\n'.join('{1:>{0}}: {2}'.format(width, k, v)
