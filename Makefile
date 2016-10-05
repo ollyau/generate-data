@@ -7,4 +7,4 @@ test1:
 	python process_local.py -d testinput -o testoutput
 
 everybodytest:
-	python process_local.py -d ${MRVBOX} -o ${MRVOUT} -skip
+	python process_local.py -d ${MRVBOX} -o ${MRVOUT}

@@ -3,6 +3,7 @@ import re
 
 import numpy as np
 
+from annuli import group_bins
 from utils import header
 
 def _getheaderfmt(i, fmt):
@@ -47,10 +48,10 @@ def writetext(bininfopath, momentspath, rprofilespath, outputPath):
         bininfo = bininfo[:-junkbins]
         moments = moments[:-junkbins]
 
-    annuli = np.searchsorted(rprofiles['r_en'],bininfo['r'])
-    r_check = np.zeros(len(rprofiles))
-    for i in range(max(annuli)+1):
-        ii = (annuli==i)
+    bingroups = group_bins(bininfo)
+    annuli, r_check = [], np.zeros(len(rprofiles))
+    for i, ii in enumerate(bingroups):
+        annuli.extend(len(ii)*[i])
         lum = bininfo['nfibers'][ii]*bininfo['flux'][ii]
         r_check[i] = np.average(bininfo['r'][ii],weights=lum)
     if not all(np.isclose(r_check,rprofiles['r'])):
