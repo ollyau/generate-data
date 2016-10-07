@@ -2,17 +2,16 @@ import argparse
 import os
 import re
 
-from modules.textfile import writetext
 from modules.fitsfile import writefits
 from modules.metafile import writemeta
-
+from modules.textfile import writetext
 
 def _outputpathlist(outputdir, gal):
     file_endings = ['-folded-moments.txt',
                     '-folded-spectra.fits',
                     '-folded-misc.txt']
     return [os.path.join(outputdir, gal, gal + e) for e in file_endings]
-    
+
 def _missingfiles(outputdir, gal):
     return not all([os.path.isfile(f) for f in _outputpathlist(outputdir, gal)])
 
@@ -30,30 +29,30 @@ def _processgal(inputdir, outputdir, gal):
     s3_B_moments = os.path.join(galdir_in, gal + '-s3-B-folded-moments.txt')
     s4_rprofiles = os.path.join(galdir_in, gal + '-s4-folded-rprofiles.txt')
     s2_params = os.path.join(galdir_in, gal + '_s2_params.txt')
-    
+
     galdir_out = os.path.join(outputdir, gal)
     if not os.path.exists(galdir_out):
         os.makedirs(galdir_out)
 
     outputpaths = _outputpathlist(outputdir, gal)
-    with open(outputpaths[0], 'wb') as data_output, \
-         open(outputpaths[1], 'wb') as fits_output, \
-         open(outputpaths[2], 'wb') as meta_output:
-        writetext(s2_bininfo, s3_B_moments, s4_rprofiles, data_output)
-        writefits(s2_binspectra, s2_fullgalaxy, s2_bininfo, s3_B_moments,
-                  s4_rprofiles, fits_output)
+
+    writetext(s2_bininfo, s3_B_moments, s4_rprofiles, outputpaths[0])
+
+    writefits(s2_binspectra, s2_fullgalaxy, s2_bininfo, s3_B_moments,
+        s4_rprofiles, outputpaths[1])
+
+    with open(outputpaths[2], 'wb') as meta_output:
         writemeta(meta_output, s2_bininfo, s3_A_temps_1, s3_A_temps_2,
                   s2_params, s3_B_moments, s4_rprofiles)
-    
 
 def main():
     desc = 'Creates public data from MASSIVE survey reduced data.'
     parser = argparse.ArgumentParser(description=desc)
 
     # required arguments
-    parser.add_argument('-d', '--directory',
+    parser.add_argument('-d', '--directory', required=True,
                         help='Path to Reduced-Data folder.')
-    parser.add_argument('-o', '--output',
+    parser.add_argument('-o', '--output', required=True,
                         help='Path to destination directory.')
 
     # optional arguments
@@ -66,8 +65,6 @@ def main():
                         help='Skips galaxies that were previously processed.')
 
     args = vars(parser.parse_args())
-    if args['directory'] is None or args['output'] is None:
-        raise ValueError('invalid argument input')
     datadir = args['directory']
     outputdir = args['output']
 
