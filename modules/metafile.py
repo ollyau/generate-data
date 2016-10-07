@@ -2,8 +2,8 @@ from collections import OrderedDict
 import datetime
 import re
 import numpy as np
-from dofits import get_sigfits, get_h4fits
 from annuli import get_re_averages
+from dofits import get_sigfits, get_h4fits
 from utils import header, getstream
 
 def _readTempsMoments(fname):
@@ -98,7 +98,7 @@ def writemeta(output, bininfo_path, temps1_path, temps2_path, s2params_path,
                          / float(binmeta.metadata['gal re']), 'r')
     items['env'] = _env_logic(binmeta)
     items['envN'] = binmeta.metadata['gal env']
-    output.write('\n'.join('{1:>{0}}: {2}'.format(keywidth, k, v)
+    output.write('\n'.join('{1:>{0}} {2}'.format(keywidth, k, v)
                            for k, v in items.iteritems()))
 
 
@@ -109,7 +109,7 @@ def writemeta(output, bininfo_path, temps1_path, temps2_path, s2params_path,
         items['{0}rad'.format(f)] = _fmt(fullbin_radius[f],'r')
         for j, mom in enumerate(['v', 'sig', 'h3', 'h4', 'h5', 'h6']):
             items['{0}{1}'.format(f, mom)] = _fmt(fullmoments[i][j],mom[0])
-    output.write('\n'.join('{1:>{0}}: {2}'.format(keywidth, k, v)
+    output.write('\n'.join('{1:>{0}} {2}'.format(keywidth, k, v)
                            for k, v in items.iteritems()))
 
     # Averages over galaxy (within effective radius; flux-weighted)
@@ -119,7 +119,7 @@ def writemeta(output, bininfo_path, temps1_path, temps2_path, s2params_path,
     avgs = get_re_averages(moments,bininfo,binmeta.metadata['gal re'])
     items.update((k, _fmt(v,k[0])) for k,v in avgs.iteritems())
     items['lam'] = _fmt(float(rmeta.metadata['lambda re']),'l')
-    output.write('\n'.join('{1:>{0}}: {2}'.format(keywidth, k, v)
+    output.write('\n'.join('{1:>{0}} {2}'.format(keywidth, k, v)
                            for k, v in items.iteritems()))
 
     # Best-fit parameters
@@ -135,5 +135,5 @@ def writemeta(output, bininfo_path, temps1_path, temps2_path, s2params_path,
     items.update((k, _fmt(v,'q')) for k,v in h4fits.iteritems())
 
     width = max(len(str(k)) for k in items.keys())
-    output.write('\n'.join('{1:>{0}}: {2}'.format(width, k, v)
+    output.write('\n'.join('{1:>{0}} {2}'.format(width, k, v)
                            for k, v in items.iteritems()))
