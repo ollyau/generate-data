@@ -19,7 +19,7 @@ def printhduinfo(fitsfile):
         for c in hdu.header.cards:
             print('{2:>{0}} {3:<{1}} {4}'.format(col1_width, col2_width, *c))
 
-def createfits(fbinspectra, ffullgalaxy, fbininfo, fmoments, rprofiles, output):
+def writefits(fbinspectra, ffullgalaxy, fbininfo, fmoments, rprofiles, output):
     junkbins = int(header(rprofiles).metadata['junk bins'])
 
     # primary hdu (1): stack s2-folded-binspectra hdu 0 (spectra), 1 (noise), 3 (bad pixel flag), 4 (ir)

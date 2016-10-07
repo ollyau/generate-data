@@ -18,34 +18,46 @@ from modules.metadata import writemeta
 from modules.text import joindata
 
 def main():
-    parser = argparse.ArgumentParser(description='Creates public data from MASSIVE survey reduced data.')
+    desc = 'Creates public data from MASSIVE survey reduced data.'
+    parser = argparse.ArgumentParser(description=desc)
 
-    parser.add_argument('-d', '--directory', help='Path to Reduced-Data folder.')
-    parser.add_argument('-o', '--output', help='Path to destination directory.')
+    parser.add_argument('-d', '--directory',
+                        help='Path to Reduced-Data folder.')
+    parser.add_argument('-o', '--output',
+                        help='Path to destination directory.')
+    
+    parser.add_argument('-cid', '--clientid',
+                        help='Client ID from Box API.')
+    parser.add_argument('-secret', '--clientsecret',
+                        help='Client secret from Box API.')
+    parser.add_argument('-token', '--accesstoken',
+                        help='Developer access token for Box API.')
 
-    parser.add_argument('-cid', '--clientid', help='Client ID from Box API.')
-    parser.add_argument('-secret', '--clientsecret', help='Client secret from Box API.')
-    parser.add_argument('-token', '--accesstoken', help='Developer access token for Box API.')
+    parser.add_argument('-i', '--include',
+                        help='Comma separated list of galaxies to include.')
+    parser.add_argument('-e', '--exclude',
+                        help='Comma separated list of galaxies to exclude.')
 
-    parser.add_argument('-i', '--include', help='Comma separated list of galaxies to include.')
-    parser.add_argument('-e', '--exclude', help='Comma separated list of galaxies to exclude.')
-
-    parser.add_argument('-skip', '--skipcompleted', help='Skips galaxies that were previously processed.')
+    parser.add_argument('-skip', '--skipcompleted',
+                        help='Skips galaxies that were previously processed.')
 
     args = vars(parser.parse_args())
     if args['directory'] is not None and args['output'] is not None:
         processlocal(args)
-    elif args['clientid'] is not None and args['clientsecret'] is not None and args['accesstoken'] is not None:
+    elif (args['clientid'] is not None and args['clientsecret'] is not None
+          and args['accesstoken'] is not None):
         processbox(args)
     else:
         raise ValueError('invalid argument input')
 
-def _missingfiles(outputdir, gal):    
-    return all([
-        os.path.isfile(os.path.join(outputdir, gal, gal + '-folded-moments.txt')),
-        os.path.isfile(os.path.join(outputdir, gal, gal + '-folded-spectra.fits')),
-        os.path.isfile(os.path.join(outputdir, gal, gal + '-folded-misc.txt'))
-    ])
+def _outputpathlist(outputdir, gal):
+    file_endings = ['-folded-moments.txt',
+                    '-folded-spectra.fits',
+                    '-folded-misc.txt']
+    return [os.path.join(outputdir, gal, gal + e) for e in file_endings]
+    
+def _missingfiles(outputdir, gal):
+    return all([os.path.isfile(f) for f in _outputpathlist(outputdir, gal)])
 
 def processlocal(args):
     datadir = args['directory']
@@ -56,43 +68,46 @@ def processlocal(args):
     galaxies = sorted(set(m.group(0) for m in (search(f) for f in files) if m))
 
     if args['skipcompleted'] is not None:
-        completedgals = os.listdir(outputdir)
-        completed = set(m.group(0) for m in (search(f) for f in completedgals) if m)
-        completed = [x for x in completed if not _missingfiles(outputdir, x)]
+        alldirs = os.listdir(outputdir)
+        galdirs = set(m.group(0) for m in (search(f) for f in alldirs) if m)
+        completed = [x for x in galdirs if not _missingfiles(outputdir, x)]
         galaxies = galaxies.difference(completed)
 
     if args['include'] is not None:
-        include = [x.strip() for x in args['include'].split(',') if x and not x.isspace()]
+        include = [x.strip() for x in args['include'].split(',')
+                   if x and not x.isspace()]
         galaxies = galaxies.intersection(include)
 
     if args['exclude'] is not None:
-        exclude = [x.strip() for x in args['exclude'].split(',') if x and not x.isspace()]
+        exclude = [x.strip() for x in args['exclude'].split(',')
+                   if x and not x.isspace()]
         galaxies = galaxies.difference(exclude)
 
     for g in galaxies:
-        filesdir = os.path.join(datadir, g, 'kinematics_paperversion', 'more_files')
+        gdir = os.path.join(datadir, g, 'kinematics_paperversion', 'more_files')
 
-        s2_folded_binspectra = os.path.join(filesdir, g + '-s2-folded-binspectra.fits')
-        s2_folded_fullgalaxy = os.path.join(filesdir, g + '-s2-folded-fullgalaxy.fits')
-        s2_folded_bininfo = os.path.join(filesdir, g + '-s2-folded-bininfo.txt')
-        s3_A_folded_temps_1 = os.path.join(filesdir, g + '-s3-A-folded-temps-1.txt')
-        s3_A_folded_temps_2 = os.path.join(filesdir, g + '-s3-A-folded-temps-2.txt')
-        s3_B_folded_moments = os.path.join(filesdir, g + '-s3-B-folded-moments.txt')
-        s4_folded_rprofiles = os.path.join(filesdir, g + '-s4-folded-rprofiles.txt')
-        s2_params = os.path.join(filesdir, g + '_s2_params.txt')
+        s2_binspectra = os.path.join(gdir, g + '-s2-folded-binspectra.fits')
+        s2_fullgalaxy = os.path.join(gdir, g + '-s2-folded-fullgalaxy.fits')
+        s2_bininfo = os.path.join(gdir, g + '-s2-folded-bininfo.txt')
+        s3_A_temps_1 = os.path.join(gdir, g + '-s3-A-folded-temps-1.txt')
+        s3_A_temps_2 = os.path.join(gdir, g + '-s3-A-folded-temps-2.txt')
+        s3_B_moments = os.path.join(gdir, g + '-s3-B-folded-moments.txt')
+        s4_rprofiles = os.path.join(gdir, g + '-s4-folded-rprofiles.txt')
+        s2_params = os.path.join(gdir, g + '_s2_params.txt')
 
-        galdir = os.path.join(outputdir, g)
+        subfolder = os.path.join(outputdir, g)
+        if not os.path.exists(subfolder):
+            os.makedirs(subfolder)
 
-        if not os.path.exists(galdir):
-            os.makedirs(galdir)
-
-        with open(os.path.join(galdir, g + '-folded-moments.txt'), 'wb') as data_output, \
-             open(os.path.join(galdir, g + '-folded-spectra.fits'), 'wb') as fits_output, \
-             open(os.path.join(galdir, g + '-folded-misc.txt'), 'wb') as meta_output:
-
-            joindata(s2_folded_bininfo, s3_B_folded_moments, s4_folded_rprofiles, data_output)
-            createfits(s2_folded_binspectra, s2_folded_fullgalaxy, s2_folded_bininfo, s3_B_folded_moments, s4_folded_rprofiles, fits_output)
-            writemeta(s2_folded_bininfo, s3_A_folded_temps_1, s3_A_folded_temps_2, s2_params, s3_B_folded_moments, s4_folded_rprofiles, meta_output)
+        outputpaths = _outputpathlist(outputdir, g)
+        with open(outputpaths[0], 'wb') as data_output, \
+             open(outputpaths[1], 'wb') as fits_output, \
+             open(outputpaths[2], 'wb') as meta_output:
+            joindata(s2_bininfo, s3_B_moments, s4_rprofiles, data_output)
+            createfits(s2_binspectra, s2_fullgalaxy, s2_bininfo, s3_B_moments,
+                       s4_rprofiles, fits_output)
+            writemeta(s2_bininfo, s3_A_temps_1, s3_A_temps_2, s2_params,
+                      s3_B_moments, s4_rprofiles, meta_output)
 
 def _getboxitems(f, relpath):
     dirs = [d for d in re.split(r'[\\/]+', relpath) if d is not '']
