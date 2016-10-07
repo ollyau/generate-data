@@ -1,0 +1,46 @@
+# Columns are as follows...
+#  r r_en sig_loc sig_en sig_loc_err lam_loc lam_loc_vmin lam_loc_vmax lam_en lam_en_vmin lam_en_vmax
+# Metadata is as follows...
+#                 gal ba: 0.65
+#                 gal re: 29.2
+#             h3 average: 0.0140319
+#                 h3 err: 0.034945872015
+#           h3 intercept: 0.0103460703343
+#       h3 intercept err: 0.01265102094
+#               h3 slope: -0.316360168875
+#           h3 slope err: 0.294771156942
+#             h4 average: 0.0332551
+#                 h4 err: 0.0449503270054
+#           h4 intercept: 0.0306108152272
+#       h4 intercept err: 0.0187597280283
+#               h4 slope: 0.227668137681
+#           h4 slope err: 0.433643966748
+#             h5 average: 0.0229825
+#                 h5 err: 0.0252239861927
+#             h6 average: 0.049121
+#                 h6 err: 0.0429485543971
+#                is slow: 1
+#              junk bins: 2
+#         lambda half re: 0.035682188936
+#              lambda re: 0.0529034042147
+#       sigma anisotropy: 0.0493106454152
+#           sigma center: 261.41993
+#          sigma half re: 262.702594396
+#               sigma re: 275.012660009
+#       slow/fast cutoff: 0.183398473276
+#              v0_binavg: 56.1185999
+#              v0_binmed: 56.9384995
+#            v0_fiducial: 58.8863575846
+#              v0_full-1: 58.8863575846
+#              v0_full-2: 56.6351743874
+#             v0_wbinavg: 57.0356147849
+#             v0_wbinmed: 56.9384995
+# Additional comments...
+#  Radial profiles have both local ("loc") and cumulative/enclosed ("en") versions
+#  Lambda profiles are also calculated with min and max V0 to verify that no major differences
+#  Included in metadata are (unweighted) averages and standard deviations of h3-h6
+#  H3 and h4 slopes and intercepts are from bootstrapped linear fits of h3/V and h4/sigma correlations
+#  Sigma anisotropy is the maximum relative deviation of sigma within an annulus
+  2.54428	  3.74811	259.30347	259.30347	 12.78642	  0.02114	  0.02645	  0.02114	  0.02114	  0.02645	  0.02114
+  6.23486	  8.34214	253.52964	256.34659	  0.74439	  0.02903	  0.02461	  0.02903	  0.02679	  0.02514	  0.02679
+ 16.18814	 26.71999	289.40964	275.01266	  2.46091	  0.05776	  0.05682	  0.05776	  0.05290	  0.05185	  0.05290

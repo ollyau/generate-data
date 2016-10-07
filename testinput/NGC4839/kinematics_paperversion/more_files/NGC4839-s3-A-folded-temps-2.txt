@@ -1,0 +1,21 @@
+# Columns are as follows:
+#  id weight flux fluxweight
+# Metadata is as follows:
+#       nonzero templates: 10
+#  out of total templates: 15
+#        bin spectra file: NGC4839-s2-folded-fullgalaxy.fits
+#   bin spectra file date: Sat Jan 16 14:07:06 2016
+#               fits file: NGC4839-s3-A-folded-main.fits
+#          fits file date: Sat Jan 16 14:15:12 2016
+# The best-fit moments are:
+#  56.6352  271.94   0.00575267 0.0596093 0.0422067 0.0324404
+55	0.216553	1145.14 	0.197603
+136	0.214643	1370.75 	0.234447
+409	0.213261	1488.54 	0.252955
+498	0.100204	1332.88 	0.106426
+943	0.0998379	1026.85 	0.0816907
+751	0.0962722	2122.18 	0.162799
+537	0.0708689	1087.22 	0.0613965
+759	0.0316276	2198.82 	0.0554149
+838	0.0297972	906.876 	0.0215324
+834	0.0263922	2184.85 	0.0459481
