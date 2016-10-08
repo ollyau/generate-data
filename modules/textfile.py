@@ -43,6 +43,9 @@ def writetext(bininfopath, momentspath, rprofilespath, outputPath):
     moments = np.genfromtxt(momentspath,dtype=None,names=True,skip_header=1)
     rprofiles = np.genfromtxt(rprofilespath,dtype=None,names=True,skip_header=1)
 
+    if hasattr(rprofilespath, 'seek'):
+        rprofilespath.seek(0)
+
     junkbins = int(header(rprofilespath).metadata['junk bins'])
     if junkbins > 0:
         bininfo = bininfo[:-junkbins]
