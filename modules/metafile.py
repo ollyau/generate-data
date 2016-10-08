@@ -68,10 +68,16 @@ def writemeta(output, bininfo_path, temps1_path, temps2_path, s2params_path,
     keywidth = 8
 
     binmeta = header(bininfo_path)
+    rmeta = header(rprofiles_path)
+
+    if hasattr(bininfo_path, 'seek'):
+        bininfo_path.seek(0)
+    if hasattr(rprofiles_path, 'seek'):
+        rprofiles_path.seek(0)
+
     bininfo = np.genfromtxt(bininfo_path,names=True,skip_header=1)
     fullmoments = _readTempsMoments(temps1_path), _readTempsMoments(temps2_path)
     moments = np.genfromtxt(moments_path,names=True,skip_header=1)
-    rmeta = header(rprofiles_path)
 
     fullbin_radius = {'f2': _read_s2_params(s2params_path),
                       'f1': np.nanmax(bininfo['rmax'])}

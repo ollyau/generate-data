@@ -1,36 +1,23 @@
 import argparse
+from io import BytesIO
 import os
 import re
-from io import BytesIO
 
-try:
-    from boxsdk import Client, OAuth2
-except ImportError as e:
-    print '\n=================='
-    print 'Error in imports: ',e
-    print '------------------'
-    print ('Everything will run fine as long as you are not'
-           ' trying to use the Box API')
-    print '==================\n'
+from boxsdk import Client, OAuth2
 
-from modules.fits import createfits
-from modules.metadata import writemeta
-from modules.text import joindata
+from modules.fitsfile import writefits
+from modules.metafile import writemeta
+from modules.textfile import writetext
 
 def main():
     desc = 'Creates public data from MASSIVE survey reduced data.'
     parser = argparse.ArgumentParser(description=desc)
 
-    parser.add_argument('-d', '--directory',
-                        help='Path to Reduced-Data folder.')
-    parser.add_argument('-o', '--output',
-                        help='Path to destination directory.')
-    
-    parser.add_argument('-cid', '--clientid',
+    parser.add_argument('-cid', '--clientid', required=True,
                         help='Client ID from Box API.')
-    parser.add_argument('-secret', '--clientsecret',
+    parser.add_argument('-secret', '--clientsecret', required=True,
                         help='Client secret from Box API.')
-    parser.add_argument('-token', '--accesstoken',
+    parser.add_argument('-token', '--accesstoken', required=True,
                         help='Developer access token for Box API.')
 
     parser.add_argument('-i', '--include',
@@ -38,85 +25,45 @@ def main():
     parser.add_argument('-e', '--exclude',
                         help='Comma separated list of galaxies to exclude.')
 
-    parser.add_argument('-skip', '--skipcompleted',
+    parser.add_argument('-skip', '--skipcompleted', action='store_true',
                         help='Skips galaxies that were previously processed.')
 
     args = vars(parser.parse_args())
-    if args['directory'] is not None and args['output'] is not None:
-        processlocal(args)
-    elif (args['clientid'] is not None and args['clientsecret'] is not None
-          and args['accesstoken'] is not None):
-        processbox(args)
-    else:
-        raise ValueError('invalid argument input')
 
-def _outputpathlist(outputdir, gal):
-    file_endings = ['-folded-moments.txt',
-                    '-folded-spectra.fits',
-                    '-folded-misc.txt']
-    return [os.path.join(outputdir, gal, gal + e) for e in file_endings]
-    
-def _missingfiles(outputdir, gal):
-    return all([os.path.isfile(f) for f in _outputpathlist(outputdir, gal)])
-
-def processlocal(args):
-    datadir = args['directory']
-    outputdir = args['output']
-
-    files = os.listdir(datadir)
-    search = re.compile(r'^[A-Z]+\d+$').search
-    galaxies = sorted(set(m.group(0) for m in (search(f) for f in files) if m))
-
-    if args['skipcompleted'] is not None:
-        alldirs = os.listdir(outputdir)
-        galdirs = set(m.group(0) for m in (search(f) for f in alldirs) if m)
-        completed = [x for x in galdirs if not _missingfiles(outputdir, x)]
-        galaxies = galaxies.difference(completed)
-
-    if args['include'] is not None:
-        include = [x.strip() for x in args['include'].split(',')
-                   if x and not x.isspace()]
-        galaxies = galaxies.intersection(include)
-
-    if args['exclude'] is not None:
-        exclude = [x.strip() for x in args['exclude'].split(',')
-                   if x and not x.isspace()]
-        galaxies = galaxies.difference(exclude)
-
-    for g in galaxies:
-        gdir = os.path.join(datadir, g, 'kinematics_paperversion', 'more_files')
-
-        s2_binspectra = os.path.join(gdir, g + '-s2-folded-binspectra.fits')
-        s2_fullgalaxy = os.path.join(gdir, g + '-s2-folded-fullgalaxy.fits')
-        s2_bininfo = os.path.join(gdir, g + '-s2-folded-bininfo.txt')
-        s3_A_temps_1 = os.path.join(gdir, g + '-s3-A-folded-temps-1.txt')
-        s3_A_temps_2 = os.path.join(gdir, g + '-s3-A-folded-temps-2.txt')
-        s3_B_moments = os.path.join(gdir, g + '-s3-B-folded-moments.txt')
-        s4_rprofiles = os.path.join(gdir, g + '-s4-folded-rprofiles.txt')
-        s2_params = os.path.join(gdir, g + '_s2_params.txt')
-
-        subfolder = os.path.join(outputdir, g)
-        if not os.path.exists(subfolder):
-            os.makedirs(subfolder)
-
-        outputpaths = _outputpathlist(outputdir, g)
-        with open(outputpaths[0], 'wb') as data_output, \
-             open(outputpaths[1], 'wb') as fits_output, \
-             open(outputpaths[2], 'wb') as meta_output:
-            joindata(s2_bininfo, s3_B_moments, s4_rprofiles, data_output)
-            createfits(s2_binspectra, s2_fullgalaxy, s2_bininfo, s3_B_moments,
-                       s4_rprofiles, fits_output)
-            writemeta(s2_bininfo, s3_A_temps_1, s3_A_temps_2, s2_params,
-                      s3_B_moments, s4_rprofiles, meta_output)
+    processbox(args)
 
 def _getboxitems(f, relpath):
     dirs = [d for d in re.split(r'[\\/]+', relpath) if d is not '']
-    items = f.get_items(100)
+    items = f.get_items(400)
     print('getting items in {0}/{1}'.format('' if f._object_id == '0' else f.name, '/'.join(dirs)))
     for d in dirs:
         folder = next(x for x in items if x.name == d)
-        items = folder.get_items(100)
+        items = folder.get_items(400)
     return items
+
+def _missingfiles(galdir):
+    gal = galdir.name
+    galdir_contents = galdir.get_items(10)
+
+    dataname = gal + '-folded-moments.txt'
+    try:
+        data = next(x for x in galdir_contents if x.name == dataname)
+    except StopIteration:
+        return True
+
+    fitsname = gal + '-folded-spectra.fits'
+    try:
+        fits = next(x for x in galdir_contents if x.name == fitsname)
+    except StopIteration:
+        return True
+
+    metaname = gal + '-folded-misc.txt'
+    try:
+        meta = next(x for x in galdir_contents if x.name == metaname)
+    except StopIteration:
+        return True
+
+    return not all(['data' in locals(), 'fits' in locals(), 'meta' in locals()])
 
 # get a client id, client secret, and 1 hour developer access token at https://berkeley.app.box.com/developers/services
 def processbox(args):
@@ -128,22 +75,21 @@ def processbox(args):
     client = Client(oauth)
     root = client.folder('0')
 
-    dataitems = _getboxitems(root, r'Test/Reduced-Data')    
+    galdirs_in = _getboxitems(root, r'MASSIVE/Reduced-Data')
     search = re.compile(r'^[A-Z]+\d+$').search
 
-    # create output folder
+    # create root output folder
     rootdirs = root.get_items(100)
     try:
-        rootoutputfolder = next(x for x in rootdirs if x.name == 'Output')
+        output_root = next(x for x in rootdirs if x.name == 'Output')
     except StopIteration:
-        rootoutputfolder = root.create_subfolder('Output')
+        output_root = root.create_subfolder('Output')
 
-    previousgalfolders = rootoutputfolder.get_items(400) # fix
+    galaxies = set(m.group(0) for m in (search(g.name) for g in galdirs_in) if m)
 
-    galaxies = set(m.group(0) for m in (search(g.name) for g in dataitems) if m)
-
-    if args['skipcompleted'] is not None:
-        completed = set(m.group(0) for m in (search(g.name) for g in previousgalfolders) if m)
+    if args['skipcompleted']:
+        prev_galdirs_out = output_root.get_items(400)
+        completed = set(prev_galdir.name for prev_galdir in prev_galdirs_out if not _missingfiles(prev_galdir))
         galaxies = galaxies.difference(completed)
 
     if args['include'] is not None:
@@ -154,32 +100,32 @@ def processbox(args):
         exclude = [x.strip() for x in args['exclude'].split(',') if x and not x.isspace()]
         galaxies = galaxies.difference(exclude)
 
-    for i in dataitems:
-        m = search(i.name)
+    for galdir_in in galdirs_in:
+        m = search(galdir_in.name)
         if not m:
-            print('skipped Test/Reduced-Data/{0}'.format(i.name))
+            print('skipped Reduced-Data/{0}'.format(galdir_in.name))
             continue
-        g = m.group(0)
+        gal = m.group(0)
 
-        if g not in galaxies:
+        if gal not in galaxies:
             continue
 
-        print('processing {0}'.format(g))
+        print('processing {0}'.format(gal))
 
         try:
-            files = _getboxitems(i, r'kinematics_paperversion/more_files')
+            files = _getboxitems(galdir_in, r'kinematics_paperversion/more_files')
         except StopIteration:
-            print('warning: missing data subdirectory ({0}/kinematics_paperversion/more_files)'.format(g))
+            print('warning: missing data subdirectory ({0}/kinematics_paperversion/more_files)'.format(gal))
             continue
 
-        file_s2_folded_binspectra = next(x for x in files if x.name == g + '-s2-folded-binspectra.fits')
-        file_s2_folded_fullgalaxy = next(x for x in files if x.name == g + '-s2-folded-fullgalaxy.fits')
-        file_s2_folded_bininfo = next(x for x in files if x.name == g + '-s2-folded-bininfo.txt')
-        file_s3_A_folded_temps_1 = next(x for x in files if x.name == g + '-s3-A-folded-temps-1.txt')
-        file_s3_A_folded_temps_2 = next(x for x in files if x.name == g + '-s3-A-folded-temps-2.txt')
-        file_s3_B_folded_moments = next(x for x in files if x.name == g + '-s3-B-folded-moments.txt')
-        file_s4_folded_rprofiles = next(x for x in files if x.name == g + '-s4-folded-rprofiles.txt')
-        file_s2_params = next(x for x in files if x.name == g + '_s2_params.txt')
+        file_s2_folded_binspectra = next(x for x in files if x.name == gal + '-s2-folded-binspectra.fits')
+        file_s2_folded_fullgalaxy = next(x for x in files if x.name == gal + '-s2-folded-fullgalaxy.fits')
+        file_s2_folded_bininfo = next(x for x in files if x.name == gal + '-s2-folded-bininfo.txt')
+        file_s3_A_folded_temps_1 = next(x for x in files if x.name == gal + '-s3-A-folded-temps-1.txt')
+        file_s3_A_folded_temps_2 = next(x for x in files if x.name == gal + '-s3-A-folded-temps-2.txt')
+        file_s3_B_folded_moments = next(x for x in files if x.name == gal + '-s3-B-folded-moments.txt')
+        file_s4_folded_rprofiles = next(x for x in files if x.name == gal + '-s4-folded-rprofiles.txt')
+        file_s2_params = next(x for x in files if x.name == gal + '_s2_params.txt')
 
         with BytesIO() as s2_folded_binspectra, \
              BytesIO() as s2_folded_fullgalaxy, \
@@ -217,64 +163,65 @@ def processbox(args):
             print('downloading {0}'.format(file_s2_params.name))
             file_s2_params.download_to(s2_params)
 
-            print('creating text file for {0}'.format(g))
+            print('creating text file for {0}'.format(gal))
             s2_folded_bininfo.seek(0)
             s3_B_folded_moments.seek(0)
             s4_folded_rprofiles.seek(0)
-            joindata(s2_folded_bininfo, s3_B_folded_moments, s4_folded_rprofiles, data_output)
+            writetext(s2_folded_bininfo, s3_B_folded_moments, s4_folded_rprofiles, data_output)
 
-            print('creating fits file for {0}'.format(g))
-            s2_folded_binspectra.seek(0)
-            s2_folded_fullgalaxy.seek(0)
-            s2_folded_bininfo.seek(0)
-            s3_B_folded_moments.seek(0)
-            s4_folded_rprofiles.seek(0)
-            createfits(s2_folded_binspectra, s2_folded_fullgalaxy, s2_folded_bininfo, s3_B_folded_moments, s4_folded_rprofiles, fits_output)
-
-            print('creating metadata file for {0}'.format(g))
+            print('creating metadata file for {0}'.format(gal))
             s2_folded_bininfo.seek(0)
             s2_params.seek(0)
             s3_A_folded_temps_1.seek(0)
             s3_A_folded_temps_2.seek(0)
             s3_B_folded_moments.seek(0)
             s4_folded_rprofiles.seek(0)
-            writemeta(s2_folded_bininfo, s3_A_folded_temps_1, s3_A_folded_temps_2, s2_params, s3_B_folded_moments, s4_folded_rprofiles, meta_output)
+            writemeta(meta_output, s2_folded_bininfo, s3_A_folded_temps_1, s3_A_folded_temps_2, s2_params, s3_B_folded_moments, s4_folded_rprofiles)
+
+            print('creating fits file for {0}'.format(gal))
+            s2_folded_binspectra.seek(0)
+            s2_folded_fullgalaxy.seek(0)
+            s2_folded_bininfo.seek(0)
+            s4_folded_rprofiles.seek(0)
+            data_output.seek(0)
+            meta_output.seek(0)
+            writefits(s2_folded_binspectra, s2_folded_fullgalaxy, s2_folded_bininfo, data_output, s4_folded_rprofiles, meta_output, fits_output)
 
             data_output.seek(0)
-            fits_output.seek(0)
             meta_output.seek(0)
+            fits_output.seek(0)
 
-            print('uploading new data for {0}'.format(g))
-            
-            # create output folder
-            galdirs = rootoutputfolder.get_items(400)
+            print('uploading new data for {0}'.format(gal))
+
+            # create per-galaxy output folder
+            galdirs_out = output_root.get_items(400)
             try:
-                outputfolder = next(x for x in galdirs if x.name == g)
+                gal_output = next(x for x in galdirs_out if x.name == gal)
             except StopIteration:
-                outputfolder = rootoutputfolder.create_subfolder('Output')
+                gal_output = output_root.create_subfolder(gal)
 
-            previousoutput = outputfolder.get_items(10)
+            prev_output = gal_output.get_items(10)
 
-            dataname = g + '-folded-moments.txt'
+            dataname = gal + '-folded-moments.txt'
             try:
-                dest = next(x for x in previousoutput if x.name == dataname)
+                dest = next(x for x in prev_output if x.name == dataname)
                 dest.update_contents_with_stream(data_output)
             except StopIteration:
-                outputfolder.upload_stream(data_output, dataname)
+                gal_output.upload_stream(data_output, dataname)
 
-            fitsname = g + '-folded-spectra.fits'
+            fitsname = gal + '-folded-spectra.fits'
             try:
-                dest = next(x for x in previousoutput if x.name == fitsname)
+                dest = next(x for x in prev_output if x.name == fitsname)
                 dest.update_contents_with_stream(fits_output)
             except StopIteration:
-                outputfolder.upload_stream(fits_output, fitsname)
+                gal_output.upload_stream(fits_output, fitsname)
 
-            metaname = g + '-folded-misc.txt'
+            metaname = gal + '-folded-misc.txt'
             try:
-                dest = next(x for x in previousoutput if x.name == metaname)
+                dest = next(x for x in prev_output if x.name == metaname)
                 dest.update_contents_with_stream(meta_output)
             except StopIteration:
-                outputfolder.upload_stream(meta_output, metaname)
+                gal_output.upload_stream(meta_output, metaname)
 
 if __name__ == '__main__':
     main()
