@@ -1,7 +1,7 @@
 #
 # Basic parameters
 #
-    date 2016-10-07T21:28:19Z
+    date 2016-10-08T00:00:40Z
       ra 264.3892
      dec 11.1217
        d 100.2

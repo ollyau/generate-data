@@ -1,3 +1,4 @@
+from collections import OrderedDict
 import re
 
 def getstream(fname):
@@ -14,17 +15,13 @@ def getstream(fname):
 
 class metadata(object):
     def __init__(self, fname):
-        self.data = {}
-        rpair = re.compile(r'^# \s+(.+): (.+)$')
-
+        self.data = OrderedDict()
         stream, opened = getstream(fname)
         for line in stream:
-            if line[0] != '#':
-                break
-            result = rpair.search(line)
-            if not result:
+            if line[0] == '#':
                 continue
-            self.data[result.group(1)] = result.group(2)
+            k, v = line.split()
+            self.data[k.strip()] = v.strip()
 
         if opened:
             stream.close()
