@@ -37,7 +37,6 @@ def _processgal(inputdir, outputdir, gal):
     outputpaths = _outputpathlist(outputdir, gal)
 
     with open(outputpaths[0], 'w+b') as data_output, \
-        open(outputpaths[1], 'wb') as fits_output, \
         open(outputpaths[2], 'w+b') as meta_output:
 
         writetext(s2_bininfo, s3_B_moments, s4_rprofiles, data_output)
@@ -48,7 +47,7 @@ def _processgal(inputdir, outputdir, gal):
         meta_output.seek(0)
 
         writefits(s2_binspectra, s2_fullgalaxy, s2_bininfo, data_output,
-                    s4_rprofiles, meta_output, fits_output)
+                    s4_rprofiles, meta_output, outputpaths[1])
 
 def main():
     desc = 'Creates public data from MASSIVE survey reduced data.'
