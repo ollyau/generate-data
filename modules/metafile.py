@@ -38,17 +38,17 @@ def _env_logic(binmeta):
     gal_env = int(binmeta.metadata['gal env'])
     gal_mhalo = float(binmeta.metadata['gal mhalo'])
     if gal_bgg == 'True' and gal_env > 1:
-        env = 'BGG'
+        env, mhalo = 'BGG', gal_mhalo
     elif gal_bgg == 'False' and gal_env > 1:
-        env = 'Satellite'
+        env, mhalo = 'Satellite', gal_mhalo
     elif gal_env == 1:
-        env = 'Isolated'
+        env, mhalo = 'Isolated', 'nan'
     else:
         msg = ('unable to determine env '
                '(gal bgg = {0}; gal env = {1}; gal mhalo = {2})'
                ''.format(gal_bgg, gal_env, gal_mhalo))
         raise RuntimeError(msg)
-    return env
+    return env, mhalo
 
 def _fmt(number, style):
     '''Cleverly formats numbers.
@@ -67,6 +67,8 @@ def _fmt(number, style):
 def writemeta(gal, output, bininfo_path, temps1_path, temps2_path,
               s2params_path, moments_path, rprofiles_path):
     keywidth = 8
+    write_template = lambda d: '\n'.join('{1:>{0}}  {2}'.format(keywidth, k, v)
+                                         for k, v in d.iteritems())
 
     binmeta = header(bininfo_path)
     rmeta = header(rprofiles_path)
@@ -92,6 +94,7 @@ def writemeta(gal, output, bininfo_path, temps1_path, temps2_path,
     # Basic parameters
     output.write('#\n# Basic parameters\n#\n')
     items = OrderedDict()
+    items['galaxy'] = gal
     items['date'] = datetime.datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ')
     items['ra'] = binmeta.metadata['gal ra']
     items['dec'] = binmeta.metadata['gal dec']
@@ -103,11 +106,12 @@ def writemeta(gal, output, bininfo_path, temps1_path, temps2_path,
     items['pakin'] = binmeta.metadata['gal pa']
     items['rmax'] = _fmt(np.nanmax(bininfo['rmax'])
                          / float(binmeta.metadata['gal re']), 'r')
-    items['env'] = _env_logic(binmeta)
+    env, mhalo = _env_logic(binmeta)
+    items['env'] = env
     items['envN'] = binmeta.metadata['gal env']
+    items['mhalo'] = mhalo
     items = checkforexceptions(items,gal)
-    output.write('\n'.join('{1:>{0}} {2}'.format(keywidth, k, v)
-                           for k, v in items.iteritems()))
+    output.write(write_template(items))
 
 
     # Full galaxy spectrum parameters
@@ -117,8 +121,7 @@ def writemeta(gal, output, bininfo_path, temps1_path, temps2_path,
         items['{0}rad'.format(f)] = _fmt(fullbin_radius[f],'r')
         for j, mom in enumerate(['v', 'sig', 'h3', 'h4', 'h5', 'h6']):
             items['{0}{1}'.format(f, mom)] = _fmt(fullmoments[i][j],mom[0])
-    output.write('\n'.join('{1:>{0}} {2}'.format(keywidth, k, v)
-                           for k, v in items.iteritems()))
+    output.write(write_template(items))
 
     # Averages over galaxy (within effective radius; flux-weighted)
     output.write('\n#\n# Averages over galaxy\n#\n')
@@ -127,8 +130,7 @@ def writemeta(gal, output, bininfo_path, temps1_path, temps2_path,
     avgs = get_re_averages(moments,bininfo,binmeta.metadata['gal re'])
     items.update((k, _fmt(v,k[0])) for k,v in avgs.iteritems())
     items['lam'] = _fmt(float(rmeta.metadata['lambda re']),'l')
-    output.write('\n'.join('{1:>{0}} {2}'.format(keywidth, k, v)
-                           for k, v in items.iteritems()))
+    output.write(write_template(items))
 
     # Best-fit parameters
     output.write('\n#\n# Best-fit parameters\n#\n')
@@ -143,5 +145,4 @@ def writemeta(gal, output, bininfo_path, temps1_path, temps2_path,
     items.update((k, _fmt(v,'q')) for k,v in h4fits.iteritems())
 
     width = max(len(str(k)) for k in items.keys())
-    output.write('\n'.join('{1:>{0}} {2}'.format(width, k, v)
-                           for k, v in items.iteritems()))
+    output.write(write_template(items))

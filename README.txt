@@ -24,6 +24,7 @@ The full list of parameters is below, broken up into sections. The basic paramet
 #
 # Basic parameters:
 #
+galaxy			name of galaxy
 date			ISO 8601 timestamp of when files were generated (UTC)
 ra	(degrees)	Right Ascension
 dec	(degrees)	Declination
@@ -36,6 +37,7 @@ pakin	(deg E of N)	axis used for folding (usually matches PA but not always)
 rmax	(Re)		maximum extent of binned data
 env			BGG, Satellite, or Isolated
 envN			number of neighbors in 2MRS HDC
+mhalo	(log10 Msun)	halo mass in 2MRS HDC
 
 #
 # Full galaxy spectrum parameters:
