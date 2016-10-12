@@ -5,6 +5,7 @@ import numpy as np
 from annuli import get_re_averages
 from dofits import get_sigfits, get_h4fits
 from utils import header, getstream
+from exceptions import checkforexceptions
 
 def _readTempsMoments(fname):
     moments = False
@@ -63,8 +64,8 @@ def _fmt(number, style):
     elif style=='q': return '{:.4f}'.format(number) #all slope/int fits
     else: raise ValueError('You broke your formatting, try again.')
 
-def writemeta(output, bininfo_path, temps1_path, temps2_path, s2params_path,
-              moments_path, rprofiles_path):
+def writemeta(gal, output, bininfo_path, temps1_path, temps2_path,
+              s2params_path, moments_path, rprofiles_path):
     keywidth = 8
 
     binmeta = header(bininfo_path)
@@ -104,6 +105,7 @@ def writemeta(output, bininfo_path, temps1_path, temps2_path, s2params_path,
                          / float(binmeta.metadata['gal re']), 'r')
     items['env'] = _env_logic(binmeta)
     items['envN'] = binmeta.metadata['gal env']
+    items = checkforexceptions(items,gal)
     output.write('\n'.join('{1:>{0}} {2}'.format(keywidth, k, v)
                            for k, v in items.iteritems()))
 
