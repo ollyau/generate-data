@@ -2,7 +2,7 @@
 # Basic parameters
 #
   galaxy  NGC1132
-    date  2016-10-12T20:42:00Z
+    date  2016-10-12T21:29:44Z
       ra  43.2159
      dec  -1.2747
        d  97.6
@@ -57,6 +57,9 @@
  sigPLs0  221.84
  sigPLg2  -0.026
  sigPLx2  2.12
+ sigtype  broken
+  g2type  BR
+  bestg2  0.171
  h3vgrad  0.0544
 h3vgrade  0.1372
   h3vint  0.0124

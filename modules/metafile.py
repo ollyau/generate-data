@@ -61,6 +61,7 @@ def _fmt(number, style):
     elif style=='l': return '{:.3f}'.format(number) #lambda
     elif style=='g': return '{:.3f}'.format(number) #gammas
     elif style=='x': return '{:.2f}'.format(number) #chisq
+    elif style=='p': return number #type (strings in the sigma fits)
     elif style=='q': return '{:.4f}'.format(number) #all slope/int fits
     else: raise ValueError('You broke your formatting, try again.')
 

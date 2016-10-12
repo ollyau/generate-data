@@ -2,7 +2,7 @@
 # Basic parameters
 #
   galaxy  UGC10918
-    date  2016-10-12T20:42:01Z
+    date  2016-10-12T21:29:44Z
       ra  264.3892
      dec  11.1217
        d  100.2
@@ -57,6 +57,9 @@
  sigPLs0  253.13
  sigPLg2  -0.012
  sigPLx2  3.04
+ sigtype  broken
+  g2type  BR
+  bestg2  0.201
  h3vgrad  -0.0737
 h3vgrade  0.7542
   h3vint  0.0213

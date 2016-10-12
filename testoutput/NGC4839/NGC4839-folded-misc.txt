@@ -2,7 +2,7 @@
 # Basic parameters
 #
   galaxy  NGC4839
-    date  2016-10-12T20:42:01Z
+    date  2016-10-12T21:29:44Z
       ra  194.3515
      dec  27.4977
        d  102.0
@@ -57,6 +57,9 @@
  sigPLs0  271.22
  sigPLg2  0.036
  sigPLx2  3.04
+ sigtype  broken
+  g2type  BR
+  bestg2  0.371
  h3vgrad  -0.3164
 h3vgrade  0.2948
   h3vint  0.0103
