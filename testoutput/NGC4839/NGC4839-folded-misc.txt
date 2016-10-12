@@ -2,12 +2,12 @@
 # Basic parameters
 #
   galaxy  NGC4839
-    date  2016-10-12T20:39:27Z
+    date  2016-10-12T20:42:01Z
       ra  194.3515
      dec  27.4977
        d  102.0
       mk  -25.85
-      re  29.2
+      re  29.20
      eps  0.35
       pa  65.0
    pakin  65.0

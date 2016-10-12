@@ -100,7 +100,7 @@ def writemeta(gal, output, bininfo_path, temps1_path, temps2_path,
     items['dec'] = binmeta.metadata['gal dec']
     items['d'] = binmeta.metadata['gal d']
     items['mk'] = binmeta.metadata['gal mk']
-    items['re'] = binmeta.metadata['gal re']
+    items['re'] = _fmt(float(binmeta.metadata['gal re']),'r')
     items['eps'] = 1.0 - float(binmeta.metadata['gal ba'])
     items['pa'] = binmeta.metadata['gal pa']
     items['pakin'] = binmeta.metadata['gal pa']
