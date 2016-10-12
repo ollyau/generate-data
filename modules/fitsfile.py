@@ -68,7 +68,7 @@ def writefits(fbinspectra, ffullgalaxy, fbininfo, fmoments, rprofiles, fmeta, ou
 
     # make file
     hdulist = fits.HDUList([hdu1, hdu2, hdu3, hdu4])
-    hdulist.writeto(output)
+    hdulist.writeto(output, clobber=True)
 
     binspectra.close()
     fullgalaxy.close()
