@@ -48,7 +48,7 @@ def get_sigfits(moments, bininfo, d):
     items['sigPLs0'] = pPL[0]
     items['sigPLg2'] = pPL[1]
     items['sigPLx2'] = chisqPL
-    if max(chisqPL,chisqBR) > 6: items['sigtype'] = 'badfit'
+    if chisqPL > 6 and chisqBR > 6: items['sigtype'] = 'badfit'
     elif chisqPL-chisqBR < 0.3: items['sigtype'] = 'single'
     elif items['sigBRg2'] < items['sigPLg2']: items['sigtype'] = 'reverse'
     else: items['sigtype'] = 'broken'
