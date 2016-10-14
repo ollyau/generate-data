@@ -111,4 +111,10 @@ sige
 
 3) NGC0000-folded-spectra.fits:
 ------------------------
+There are a total of 4 HDUs in the FITS file.
 
+The first and second HDUs provide spectra, noise, instrument resolution, and bad pixel data.  The first (primary) HDU has this data for each bin, as well as the metadata from folded-misc.txt as header cards.  The second HDU contains full galaxy data instead of data per bin.  Both the first and second HDUs have header cards to describe the wavelength range of the spectra.  The first two HDUs have a multi-dimensional data array arranged as follows: data[i][j][k] where i, j, k are bin, column, and data.  The value of j ("column") can be 0, 1, 2, or 3, corresponding to spectra, noise, instrument resolution, and bad pixel data respectively.
+
+The third HDU is a table HDU with the contents of folded-moments.txt; see previous section for documentation of values.
+
+The fourth HDU is a table HDU containing additional information (rmin rmax thmin thmax) for each bin.
