@@ -40,7 +40,7 @@ def _processgal(inputdir, outputdir, gal):
         open(outputpaths[2], 'w+b') as meta_output:
 
         writetext(s2_bininfo, s3_B_moments, s4_rprofiles, data_output)
-        writemeta(meta_output, s2_bininfo, s3_A_temps_1, s3_A_temps_2,
+        writemeta(gal, meta_output, s2_bininfo, s3_A_temps_1, s3_A_temps_2,
                     s2_params, s3_B_moments, s4_rprofiles)
 
         data_output.seek(0)

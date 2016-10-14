@@ -1,63 +1,68 @@
 #
 # Basic parameters
 #
-    date 2016-10-08T00:00:37Z
-      ra 194.3515
-     dec 27.4977
-       d 102.0
-      mk -25.85
-      re 29.2
-     eps 0.35
-      pa 65.0
-   pakin 65.0
-    rmax 0.92
-     env Satellite
-    envN 49
+  galaxy  NGC4839
+    date  2016-10-12T21:29:44Z
+      ra  194.3515
+     dec  27.4977
+       d  102.0
+      mk  -25.85
+      re  29.20
+     eps  0.35
+      pa  65.0
+   pakin  65.0
+    rmax  0.92
+     env  Satellite
+    envN  49
+   mhalo  14.9
 #
 # Full galaxy spectrum parameters
 #
-   f1rad 77.91
-     f1v 58.89
-   f1sig 291.56
-    f1h3 0.0308
-    f1h4 0.0923
-    f1h5 0.0627
-    f1h6 -0.0056
-   f2rad 25.00
-     f2v 56.64
-   f2sig 271.94
-    f2h3 0.0058
-    f2h4 0.0596
-    f2h5 0.0422
-    f2h6 0.0324
+   f1rad  77.91
+     f1v  58.89
+   f1sig  291.56
+    f1h3  0.0308
+    f1h4  0.0923
+    f1h5  0.0627
+    f1h6  -0.0056
+   f2rad  25.00
+     f2v  56.64
+   f2sig  271.94
+    f2h3  0.0058
+    f2h4  0.0596
+    f2h5  0.0422
+    f2h6  0.0324
 #
 # Averages over galaxy
 #
-    sigc 261.42
-  sigavg 275.01
- sigavge 2.89
-   h3avg 0.0094
-  h3avge 0.0075
-   h4avg 0.0606
-  h4avge 0.0094
-   h5avg 0.0430
-  h5avge 0.0091
-   h6avg 0.0267
-  h6avge 0.0092
-     lam 0.053
+    sigc  261.42
+  sigavg  275.01
+ sigavge  2.89
+   h3avg  0.0094
+  h3avge  0.0075
+   h4avg  0.0606
+  h4avge  0.0094
+   h5avg  0.0430
+  h5avge  0.0091
+   h6avg  0.0267
+  h6avge  0.0092
+     lam  0.053
 #
 # Best-fit parameters
 #
- sigBRs0 268.78
- sigBRg1 -0.136
- sigBRg2 0.371
- sigBRx2 1.36
- sigPLs0 271.22
- sigPLg2 0.036
- sigPLx2 3.04
- h3vgrad -0.3164
-h3vgrade 0.2948
-  h3vint 0.0103
- h3vinte 0.0127
- h4rgrad 0.0986
-  h4rint -0.0068
+ sigBRs0  268.78
+ sigBRg1  -0.136
+ sigBRg2  0.371
+ sigBRx2  1.36
+ sigPLs0  271.22
+ sigPLg2  0.036
+ sigPLx2  3.04
+ sigtype  broken
+  g2type  BR
+  bestg2  0.371
+ h3vgrad  -0.3164
+h3vgrade  0.2948
+  h3vint  0.0103
+ h3vinte  0.0127
+ h4rgrad  0.0986
+  h4rint  -0.0068

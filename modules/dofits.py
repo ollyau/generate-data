@@ -48,6 +48,16 @@ def get_sigfits(moments, bininfo, d):
     items['sigPLs0'] = pPL[0]
     items['sigPLg2'] = pPL[1]
     items['sigPLx2'] = chisqPL
+    if chisqPL > 6 and chisqBR > 6: items['sigtype'] = 'badfit'
+    elif chisqPL-chisqBR < 0.3: items['sigtype'] = 'single'
+    elif items['sigBRg2'] < items['sigPLg2']: items['sigtype'] = 'reverse'
+    else: items['sigtype'] = 'broken'
+    if items['sigtype'] == 'broken':
+        items['g2type'] = 'BR'
+        items['bestg2'] = items['sigBRg2']
+    else:
+        items['g2type'] = 'PL'
+        items['bestg2'] = items['sigPLg2']
     return items
 
 def get_h4fits(moments, bininfo, d):

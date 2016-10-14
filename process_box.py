@@ -176,7 +176,7 @@ def processbox(args):
             s3_A_folded_temps_2.seek(0)
             s3_B_folded_moments.seek(0)
             s4_folded_rprofiles.seek(0)
-            writemeta(meta_output, s2_folded_bininfo, s3_A_folded_temps_1, s3_A_folded_temps_2, s2_params, s3_B_folded_moments, s4_folded_rprofiles)
+            writemeta(gal, meta_output, s2_folded_bininfo, s3_A_folded_temps_1, s3_A_folded_temps_2, s2_params, s3_B_folded_moments, s4_folded_rprofiles)
 
             print('creating fits file for {0}'.format(gal))
             s2_folded_binspectra.seek(0)
