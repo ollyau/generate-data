@@ -92,7 +92,7 @@ h4rint			intercept of h4 vs log r
 
 2) NGC0000-folded-moments.txt:
 -----------------------
-Each row represents a single folded bin; they are sorted by bin radius. In order to get the bin luminosity for purposes of luminosity weighting, multiply nf*flux; number of fibers is equivalent to area, since all fibers have equal coverage. (Note that the units are arbitrary, so this is only gives luminosity in a relative sense within the galaxy.) Radial profiles can be constructed by taking a luminosity-weighted average of some quantity over bins with the same annulus number; this corresponds obviously to the binned annuli in the outer regions, and divides the inner single-fiber bins into some reasonable number of annuli.
+Each row represents a single folded bin; they are sorted roughly by bin radius. (Single-fiber bins are sorted by radius; multi-fiber bins are listed clockwise from the major axis within each annulus.)
 
 --The columns are as follows:
 bin			bin number
@@ -101,20 +101,24 @@ ann			annulus number (used to create radial profiles)
 flux			average bin flux, in arbitrary units
 r	(arcsec)	bin radius
 th	(deg E of N)	angle theta of bin
-V
-Ve
-sig
-sige
+V			velocity
+Ve			error on velocity
+sig			dispersion
+sige			error on dispersion
 [hN]			higher moments h3, h4, h5, h6
 [hNe]			errors on higher moments
+rmin	(arcsec)	minimum R boundary of bin
+rmax	(arcsec)	maximum R boundary of bin
+thmin	(deg E of N)	minimum theta boundary of bin
+thmax	(deg E of N)	maximum theta boundary of bin
+
+In order to get the bin luminosity for purposes of luminosity weighting, multiply nf*flux; number of fibers is equivalent to area, since all fibers have equal coverage. (Note that the units are arbitrary, so this is only gives luminosity in a relative sense within the galaxy.) Radial profiles can be constructed by taking a luminosity-weighted average of some quantity over bins with the same annulus number; this corresponds obviously to the binned annuli in the outer regions, and divides the inner single-fiber bins into some reasonable number of annuli.
 
 
 3) NGC0000-folded-spectra.fits:
 ------------------------
 There are a total of 4 HDUs in the FITS file.
 
-The first and second HDUs provide spectra, noise, instrument resolution, and bad pixel data.  The first (primary) HDU has this data for each bin, as well as the metadata from folded-misc.txt as header cards.  The second HDU contains full galaxy data instead of data per bin.  Both the first and second HDUs have header cards to describe the wavelength range of the spectra.  The first two HDUs have a multi-dimensional data array arranged as follows: data[i][j][k] where i, j, k are bin, column, and data.  The value of j ("column") can be 0, 1, 2, or 3, corresponding to spectra, noise, instrument resolution, and bad pixel data respectively.
+The first and second HDUs provide spectra, noise, instrument resolution, and bad pixel data.  The first (primary) HDU has this data for each bin, as well as the metadata from folded-misc.txt as header cards.  The second HDU contains full galaxy data instead of data per bin.  Both the first and second HDUs have header cards to describe the wavelength range of the spectra.  The first two HDUs have a multi-dimensional data array arranged as follows: data[i,j,k] where i, j, k are bin, column, and wavelength pixel. Thus j can be 0, 1, 2, or 3, corresponding to spectra, noise, instrument resolution, and bad pixel data respectively.
 
-The third HDU is a table HDU with the contents of folded-moments.txt; see previous section for documentation of values.
-
-The fourth HDU is a table HDU containing additional information (rmin rmax thmin thmax) for each bin.
+The third HDU is a table HDU with the contents of folded-moments.txt; see previous section for documentation.
