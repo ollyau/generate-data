@@ -83,12 +83,26 @@ sigBRx2			chisq per dof for broken powerlaw fit
 sigPLs0			sigma0 for single powerlaw fit
 sigPLg2			gamma2 for single powerlaw fit (gamma1=gamma2)
 sigPLx2			chisq per dof for single powerlaw fit
+sigtype			detailed classification of sigma fits (see below)
+g2type			classification of "best" sigma fit/gamma2 value (see below)
 h3vgrad			slope of h3 vs v/sigma
 h3vgrade		error on slope of h3 vs v/sigma
 h3vint			intercept of h3 vs v/sigma
 h3vinte			error on intercept of h3 vs v/sigma
 h4rgrad			slope of h4 vs log r
 h4rint			intercept of h4 vs log r
+
+####
+Notes about the sigma classifications:
+The detailed classification has 4 choices:
+  broken   (sigBRx2 improves on sigPLx2 by 0.3 AND sigBRg2 > sigBRg1)
+  reversed (sigBRx2 improves on sigPLx2 by 0.3 AND sigBRg2 < sigBRg1)
+  badfit   (sigBRx2 and sigPLx2 are both > 6)
+  single   (sigBRx2 within 0.3 of sigPLx2)
+The choice of "best" fit is either PL (single power law) or BR (broken power law):
+  BR is chosen only for 'broken' galaxies
+  PL is chosen for the rest; 'reversed', 'badfit', and 'single'
+As of paper V, all 'reversed' galaxies were only borderline cases (e.g. the chisq improvement was barely more than 0.3) and generally suffered from having few data points, so it is justified to declare them well-fit by the single power law. The remaining galaxies will have sigma fits classified by the same logic without inspecting each fit.
 
 2) NGC0000-folded-moments.txt:
 -----------------------
