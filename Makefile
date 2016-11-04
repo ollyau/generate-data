@@ -11,3 +11,6 @@ everybodytest:
 
 exceptiontest:
 	python process_local.py -d ${MRVBOX} -o ${MRVOUT} -i 'NGC1129,NGC4874'
+
+papertable:
+	python table.py -i ${MRVOUT} -o . -p
