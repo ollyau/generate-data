@@ -5,40 +5,41 @@ import re
 def main():
     parser = argparse.ArgumentParser(
         description='Creates data table from MASSIVE survey public data.'
-        )
+    )
 
     parser.add_argument(
         '-i', '--input',
         required=True,
         help='Path to public data folder.'
-        )
+    )
 
     parser.add_argument(
         '-o', '--output',
         required=True,
         help='Path to destination directory.'
-        )
-
-    parser.add_argument(
-        '-a', '--alternate',
-        action='store_true',
-        help='Creates table with alternate data.'
-        )
+    )
 
     parser.add_argument(
         '-p', '--paperonly',
         action='store_true',
         help='Creates table with only galaxies from paper V.'
-        )
+    )
 
     args = vars(parser.parse_args())
 
     createtable(
         args['input'],
         args['output'],
-        args['alternate'],
+        False,
         args['paperonly']
-        )
+    )
+
+    createtable(
+        args['input'],
+        args['output'],
+        True,
+        args['paperonly']
+    )
 
 def resultlen(data, fmt):
     if '.' in fmt:
@@ -73,7 +74,7 @@ def createtable(src, dest, alt, paperonly):
         'NGC3158', 'NGC3805', 'NGC3842', 'NGC4073', 'NGC4472', 'NGC4555', 'NGC4839', 'NGC4874',
         'NGC4889', 'NGC4914', 'NGC5129', 'UGC10918', 'NGC7242', 'NGC7265', 'NGC7426', 'NGC7436',
         'NGC7556'
-        ]
+    ]
 
     if paperonly:
         galaxies = galaxies.intersection(papergalaxies)
@@ -99,7 +100,7 @@ def createtable(src, dest, alt, paperonly):
             ('h3vgrad', ''),
             ('h3vgrade', ''),
             ('h4rgrad', '')
-            ]
+        ]
     else:
         columns = [
             ('galaxy', ''),
@@ -115,7 +116,7 @@ def createtable(src, dest, alt, paperonly):
             ('sigc', '.0f'),
             ('sigavg', '.0f'),
             ('envN', '.0f')
-            ]
+        ]
 
     cols, fmts = zip(*columns)
     #widths = [max(len(data[g][key]) for g in data) for key in cols]
@@ -131,7 +132,9 @@ def createtable(src, dest, alt, paperonly):
     #widths = [max(len(data[g][key]) for g in data) for key in cols]
     #fmt = '  '.join('{{:>{0}}}'.format(x) for x in widths)
 
-    with open(os.path.join(dest, 'table.txt'), 'w') as out:
+    fname = 'table{}{}.txt'.format('-paper' if paperonly else '-all', '-extras' if alt else '')
+
+    with open(os.path.join(dest, fname), 'w') as out:
         out.write('# ' + hdrfmt.format(*cols) + '\n')
 
         if 'pa' in cols:
@@ -160,4 +163,3 @@ def readmeta(path):
 
 if __name__ == '__main__':
     main()
-    
