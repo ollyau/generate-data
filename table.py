@@ -87,6 +87,7 @@ def createtable(src, dest, alt, paperonly):
             ('mhalo', ''),
             ('sigtype', ''),
             ('g2type', ''),
+            ('sig0', ''),
             ('gam1', ''),
             ('gam2', ''),
             ('h3avg', ''),
