@@ -34,7 +34,11 @@ def writetext(bininfopath, momentspath, rprofilespath, outputPath):
         ('h5', '%7.4f'),
         ('h5e', '%6.4f'),
         ('h6', '%7.4f'),
-        ('h6e', '%6.4f')
+        ('h6e', '%6.4f'),
+        ('rmin', '%6.2f'),
+        ('rmax', '%6.2f'),
+        ('thmin', '%7.2f'),
+        ('thmax', '%7.2f')
         ]
 
     cols, fmts = zip(*columns)
@@ -78,7 +82,11 @@ def writetext(bininfopath, momentspath, rprofilespath, outputPath):
         moments['h5'],
         moments['h5err'],
         moments['h6'],
-        moments['h6err']
+        moments['h6err'],
+        bininfo['rmin'],
+        bininfo['rmax'],
+        bininfo['thmin'],
+        bininfo['thmax']
     ))
 
     v = newdata[:, 6]

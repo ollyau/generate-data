@@ -2,7 +2,7 @@ from astropy.io import fits
 import numpy as np
 from utils import header, metadata
 
-def writefits(fbinspectra, ffullgalaxy, fbininfo, fmoments, rprofiles, fmeta, output):
+def writefits(fbinspectra, ffullgalaxy, fmoments, rprofiles, fmeta, output):
     junkbins = int(header(rprofiles).metadata['junk bins'])
 
     # primary hdu (1): stack s2-folded-binspectra hdu 0 (spectra), 1 (noise), 3 (bad pixel flag), 4 (ir)
@@ -55,19 +55,13 @@ def writefits(fbinspectra, ffullgalaxy, fbininfo, fmoments, rprofiles, fmeta, ou
     # load moments.txt (from public data generation); junk bins already discarded
     hdu3data = np.genfromtxt(fmoments, names=True)
 
-    # load bininfo.txt
-    bininfo = np.genfromtxt(fbininfo, names=True, skip_header=1, usecols=(7, 8, 9, 10))
-    bincount = len(bininfo)
-    hdu4data = bininfo if junkbins == 0 else np.delete(bininfo, range(bincount - junkbins, bincount), 0)
-
     # create hdus
     hdu1 = fits.PrimaryHDU(hdu1data, hdu1header, 'BINSPEC')
     hdu2 = fits.ImageHDU(hdu2data, hdu2header, 'GALSPEC')
     hdu3 = fits.TableHDU(hdu3data, name='MOMENTS')
-    hdu4 = fits.TableHDU(hdu4data, name='BINEXTRA')
 
     # make file
-    hdulist = fits.HDUList([hdu1, hdu2, hdu3, hdu4])
+    hdulist = fits.HDUList([hdu1, hdu2, hdu3])
     hdulist.writeto(output, clobber=True)
 
     binspectra.close()
