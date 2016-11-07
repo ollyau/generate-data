@@ -2,7 +2,7 @@
 # Basic parameters
 #
   galaxy  UGC10918
-    date  2016-10-12T21:29:44Z
+    date  2016-11-07T20:43:44Z
       ra  264.3892
      dec  11.1217
        d  100.2

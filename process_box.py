@@ -181,11 +181,10 @@ def processbox(args):
             print('creating fits file for {0}'.format(gal))
             s2_folded_binspectra.seek(0)
             s2_folded_fullgalaxy.seek(0)
-            s2_folded_bininfo.seek(0)
             s4_folded_rprofiles.seek(0)
             data_output.seek(0)
             meta_output.seek(0)
-            writefits(s2_folded_binspectra, s2_folded_fullgalaxy, s2_folded_bininfo, data_output, s4_folded_rprofiles, meta_output, fits_output)
+            writefits(s2_folded_binspectra, s2_folded_fullgalaxy, data_output, s4_folded_rprofiles, meta_output, fits_output)
 
             data_output.seek(0)
             meta_output.seek(0)
