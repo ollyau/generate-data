@@ -27,6 +27,8 @@ def _processgal(inputdir, outputdir, gal):
     s3_A_temps_1 = os.path.join(galdir_in, gal + '-s3-A-folded-temps-1.txt')
     s3_A_temps_2 = os.path.join(galdir_in, gal + '-s3-A-folded-temps-2.txt')
     s3_B_moments = os.path.join(galdir_in, gal + '-s3-B-folded-moments.txt')
+    s3_A_folded_main = os.path.join(galdir_in, gal + '-s3-A-folded-main.fits')
+    s3_B_folded_main = os.path.join(galdir_in, gal + '-s3-B-folded-main.fits')
     s4_rprofiles = os.path.join(galdir_in, gal + '-s4-folded-rprofiles.txt')
     s2_params = os.path.join(galdir_in, gal + '_s2_params.txt')
 
@@ -46,8 +48,9 @@ def _processgal(inputdir, outputdir, gal):
         data_output.seek(0)
         meta_output.seek(0)
 
-        writefits(s2_binspectra, s2_fullgalaxy, data_output,
-                  s4_rprofiles, meta_output, outputpaths[1])
+        writefits(s2_binspectra, s2_fullgalaxy, s3_A_folded_main,
+                  s3_B_folded_main, data_output, s4_rprofiles,
+                  meta_output, outputpaths[1])
 
 def main():
     desc = 'Creates public data from MASSIVE survey reduced data.'

@@ -123,6 +123,8 @@ def processbox(args):
         file_s2_folded_bininfo = next(x for x in files if x.name == gal + '-s2-folded-bininfo.txt')
         file_s3_A_folded_temps_1 = next(x for x in files if x.name == gal + '-s3-A-folded-temps-1.txt')
         file_s3_A_folded_temps_2 = next(x for x in files if x.name == gal + '-s3-A-folded-temps-2.txt')
+        file_s3_A_folded_main = next(x for x in files if x.name == gal + '-s3-A-folded-main.fits')
+        file_s3_B_folded_main = next(x for x in files if x.name == gal + '-s3-B-folded-main.fits')
         file_s3_B_folded_moments = next(x for x in files if x.name == gal + '-s3-B-folded-moments.txt')
         file_s4_folded_rprofiles = next(x for x in files if x.name == gal + '-s4-folded-rprofiles.txt')
         file_s2_params = next(x for x in files if x.name == gal + '_s2_params.txt')
@@ -132,6 +134,8 @@ def processbox(args):
              BytesIO() as s2_folded_bininfo, \
              BytesIO() as s3_A_folded_temps_1, \
              BytesIO() as s3_A_folded_temps_2, \
+             BytesIO() as s3_A_folded_main, \
+             BytesIO() as s3_B_folded_main, \
              BytesIO() as s3_B_folded_moments, \
              BytesIO() as s4_folded_rprofiles, \
              BytesIO() as s2_params, \
@@ -150,6 +154,12 @@ def processbox(args):
 
             print('downloading {0}'.format(file_s3_A_folded_temps_1.name))
             file_s3_A_folded_temps_1.download_to(s3_A_folded_temps_1)
+
+            print('downloading {0}'.format(file_s3_A_folded_main.name))
+            file_s3_A_folded_main.download_to(s3_A_folded_main)
+
+            print('downloading {0}'.format(file_s3_B_folded_main.name))
+            file_s3_B_folded_main.download_to(s3_B_folded_main)
 
             print('downloading {0}'.format(file_s3_A_folded_temps_2.name))
             file_s3_A_folded_temps_2.download_to(s3_A_folded_temps_2)
@@ -184,7 +194,7 @@ def processbox(args):
             s4_folded_rprofiles.seek(0)
             data_output.seek(0)
             meta_output.seek(0)
-            writefits(s2_folded_binspectra, s2_folded_fullgalaxy, data_output, s4_folded_rprofiles, meta_output, fits_output)
+            writefits(s2_folded_binspectra, s2_folded_fullgalaxy, s3_A_folded_main, s3_B_folded_main, data_output, s4_folded_rprofiles, meta_output, fits_output)
 
             data_output.seek(0)
             meta_output.seek(0)
