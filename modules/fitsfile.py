@@ -1,5 +1,6 @@
-from astropy.io import fits
+import re
 import numpy as np
+from astropy.io import fits
 from utils import header, metadata
 
 def writefits(fbinspectra, ffullgalaxy, fs3amain, fs3bmain, fmoments, rprofiles, fmeta, output):
@@ -20,12 +21,18 @@ def writefits(fbinspectra, ffullgalaxy, fs3amain, fs3bmain, fmoments, rprofiles,
     bincount = len(result)
     hdu1data = result if junkbins == 0 else np.delete(result, range(bincount - junkbins, bincount), 0)
 
+    galname = re.match(r'^[A-Z]+\d+', binspectra[0].header['IRFILE']).group(0)
+
+    allcloseargs = {}
+    if galname == 'NGC3209':
+        allcloseargs = {'atol': 1.e-7}
+
     binspectrawavespace = np.diff(np.log10(binspectra['WAVES'].data))
-    if not np.allclose(binspectrawavespace, binspectrawavespace[0]):
+    if not np.allclose(binspectrawavespace, binspectrawavespace[0], **allcloseargs):
         raise RuntimeError('wavelength spacing in s2-folded-binspectra is not consistent')
 
     s3bmainwavespace = np.diff(np.log10(s3bmain['WAVES'].data))
-    if not np.allclose(s3bmainwavespace, s3bmainwavespace[0]):
+    if not np.allclose(s3bmainwavespace, s3bmainwavespace[0], **allcloseargs):
         raise RuntimeError('wavelength spacing in s3-B-folded-main is not consistent')
 
     if not np.isclose(binspectrawavespace[0], s3bmainwavespace[0]):
@@ -54,11 +61,11 @@ def writefits(fbinspectra, ffullgalaxy, fs3amain, fs3bmain, fmoments, rprofiles,
     hdu2data = np.stack((fullgalaxy[0].data, fullgalaxy[1].data, fullgalaxy[4].data, fullgalaxy[3].data, s3athing), axis=1)
 
     fullgalaxywavespace = np.diff(np.log10(fullgalaxy['WAVES'].data))
-    if not np.allclose(fullgalaxywavespace, fullgalaxywavespace[0]):
+    if not np.allclose(fullgalaxywavespace, fullgalaxywavespace[0], **allcloseargs):
         raise RuntimeError('wavelength spacing in s2-folded-fullgalaxy is not consistent')
 
     s3amainwavespace = np.diff(np.log10(s3amain['WAVES'].data))
-    if not np.allclose(s3amainwavespace, s3amainwavespace[0]):
+    if not np.allclose(s3amainwavespace, s3amainwavespace[0], **allcloseargs):
         raise RuntimeError('wavelength spacing in s3-A-folded-main is not consistent')
 
     if not np.isclose(fullgalaxywavespace[0], s3amainwavespace[0]):
